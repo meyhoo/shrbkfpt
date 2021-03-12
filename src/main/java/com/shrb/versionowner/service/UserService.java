@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -25,7 +22,7 @@ public class UserService {
         List<String> userInfoStrList = MyFileUtils.readFileAllLines(userInfoFilePath, "utf-8");
         Map<String, User> userMap = new HashMap<>();
         for (String userInfoStr : userInfoStrList) {
-            String[] userInfoArray = userInfoStr.split("|");
+            String[] userInfoArray = userInfoStr.split("\\|");
             User user = new User();
             user.setUserName(userInfoArray[0]);
             user.setPassword(userInfoArray[1]);

@@ -1,5 +1,6 @@
 package com.shrb.versionowner.security.shiro;
 
+import com.shrb.versionowner.service.RuntimeCacheService;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -39,7 +40,6 @@ public class ShiroConfig implements ApplicationContextAware {
 //     * @return
 //     */
 //    @Bean
-//    @DependsOn("runtimeCacheService")
 //    public ShiroRealm shiroRealm(){
 //        ShiroRealm shiroRealm = new ShiroRealm();
 //        return shiroRealm;
@@ -52,7 +52,8 @@ public class ShiroConfig implements ApplicationContextAware {
     @Bean
     public SecurityManager securityManager(){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealm((ShiroRealm)applicationContext.getBean("shiroRealm"));
+        ShiroRealm shiroRealm = (ShiroRealm)applicationContext.getBean("shiroRealm");
+        securityManager.setRealm(shiroRealm);
         return  securityManager;
     }
     public DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator(){
