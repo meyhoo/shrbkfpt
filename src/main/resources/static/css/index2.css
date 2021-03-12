@@ -1,0 +1,441 @@
+/*滚动条美化css 适合WebKit引擎的浏览器如chrome、oprea、Safari等*/
+::-webkit-scrollbar {  
+	width: 16px;   
+}  
+  
+::-webkit-scrollbar-track,  
+::-webkit-scrollbar-thumb {  
+	border-radius: 999px;  
+	border: 5px solid transparent;  
+}  
+  
+::-webkit-scrollbar-track {  
+	box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;  
+}  
+  
+::-webkit-scrollbar-thumb {  
+	min-height: 20px;  
+	background-clip: content-box;  
+	box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;  
+}  
+  
+::-webkit-scrollbar-corner {  
+	background: transparent;  
+}
+
+/*avalon��ʼ��ǰ����*/
+.ms-controller,.ms-important,[ms-controller],[ms-important]{
+     visibility: hidden;
+}
+
+html, body{
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font: 14px/1.5 arial,'',sans-serif !important;
+	/*font-family: "YouYuan";*/
+	font-size: 14px; 
+}
+
+.dialog-content {
+	position: absolute; 
+	width: 100%; 
+	height: 98%;
+}
+
+/*���ҳ��css*/
+
+.mycontainer {
+	padding: 0px 20px;
+}
+
+.mycontainer-title {
+	padding: 10px 0;
+	border-bottom: 2px solid #E9E9E9;
+}
+
+.mycontainer-title-icon {
+	margin-left: 10px;
+	color: #27a9e3;
+}
+
+.mycontainer-title-text {
+	font-size: 16px;
+	color: #27a9e3;
+}
+
+.mycontainer-search {
+	background: #FAFAFA;
+}
+
+.mycontainer-search-row {
+	height: 35px;
+	line-height: 35px;
+	padding-left: 10px;
+	vertical-align: middle;
+}
+
+.mycontainer-search-row2 {
+	margin-top: 5px;
+	padding-left: 10px;
+	vertical-align: top;
+}
+
+.mycontainer-search-btn {
+	text-align: right;
+	padding-bottom: 10px;
+    margin-right: 10px;
+}
+
+.search-text {
+	display: inline-block;
+	color: #5A5A5A;
+}
+
+.search-input {
+	height: 24px;
+	line-height: 24px;
+}
+
+.mycontainer-button {
+	height: 50px;
+	line-height: 50px;
+}
+
+table .able-a {
+	margin-left: 5px;
+	margin-right: 5px;
+	color: blue;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+table .unable-a {
+	margin-left: 5px;
+	margin-right: 5px;
+	color: #ccc;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+
+.table-tool {
+	padding: 10px 0;
+}
+
+/*��css*/
+.form-title {
+	margin: 8px 0;
+}
+
+.form-title-icon {
+	margin-left: 10px;
+	color: #27a9e3;
+	font-size: 12px;
+}
+
+.form-title-text {
+	color: #000;
+}
+
+.form-table {
+	width: 100%;
+}
+
+.form-table td {
+	height: 35px;
+}
+
+.form-input {
+	height: 24px;
+	line-height: 24px;
+}
+
+.mycontainer-title-return {
+	float: right;
+	padding-right: 10px;
+}
+
+.dimg {
+	padding: 10px 0;
+}
+
+.form-btn {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+/*dataTable�޸�css*/
+.tbb .dataTables_info {
+	float: left;
+}
+
+.tbb .dataTables_length {
+	float: left;
+	margin-top: 5px;
+    margin-left: 20px;
+}
+
+/*bootstrap�޸�*/
+.myhr {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.form-input[type=file] {
+	display: inline;
+}
+
+/*layer�޸�*/
+
+
+/*��ȼ���*/
+.width60 {
+	width: 60px;
+}
+
+.width100 {
+	width: 100px;
+}
+
+.width200 {
+	width: 200px;
+}
+
+.width300 {
+	width: 300px;
+}
+
+.width400 {
+	width: 400px;
+}
+
+.wper25 {
+	width: 25%;
+}
+
+.wper50 {
+	width: 50%;
+}
+
+.wper60 {
+	width: 60%;
+}
+
+.wper70 {
+	width: 70%;
+}
+
+.wper80 {
+	width: 80%;
+}
+
+.wper81 {
+	width: 81%;
+}
+
+/*margin����*/
+.mgl7 {
+	margin-left: 7px;
+}
+
+.mgl20 {
+	margin-left: 20px;
+}
+
+.mgl40 {
+	margin-left: 40px;
+}
+
+/*vertical-align����*/
+.vertop {
+	vertical-align: top;
+}
+
+.vermid {
+	vertical-align: middle;
+}
+
+/*color����*/
+.red {
+	color: red;
+}
+
+/*float����*/
+.fl {
+	float: left;
+}
+
+.fr {
+	float: right;
+}
+
+/*display����*/
+.dis-block {
+	display: block;
+}
+
+.dis-iblock {
+	display: inline-block;
+}
+
+/*home*/
+.home-div {
+	margin-top: 20px;
+	border-top: 1px solid #eee;
+}
+
+.home-title {
+	position: relative;
+	padding-left: 30px;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+	color: #fff;
+	font-size: 14px;
+	font-weight: bold;
+	border-left: 1px solid #27a9e3;
+	border-right: 1px solid #27a9e3;
+}
+
+.home-title-icon {
+	position: absolute;
+	left: 10px;
+	top: 8px;
+}
+
+.home-title-color1 {
+	background: #27a9e3;
+}
+
+.home-table {
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+.home-content-one {
+	position: relative;
+	border-left: 1px solid #eee;
+	border-right: 1px solid #fff;
+	border-bottom: 1px solid #eee;
+}
+
+.home-content-one-last {
+	border-right: 1px solid #eee;
+}
+
+/*
+.home-content-one:hover {
+	cursor: pointer;
+	border-left: 1px solid #fa7257;
+	border-right: 1px solid #fa7257;
+	border-bottom: 1px solid #fa7257;
+}
+*/
+
+.home-content-title {
+	position: absolute;
+	left: 15px;
+	top: 10px;
+	font-size: 14px;
+}
+
+.home-content-num {
+	line-height: 100px;
+	text-align: center;
+	font-size: 26px;
+	font-weight: bold;
+}
+
+.home-content-unit {
+	margin-left: 5px;
+	font-size: 15px;
+	font-weight: normal;
+}
+
+
+/*消息中心*/
+.message-table {
+	width: 100%;
+}
+
+.message-table tr {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	border-bottom: 1px solid #eee;
+}
+
+.message-table-top {
+	margin-top: 10px;
+	height: 30px;
+	line-height: 30px;
+	font-size: 14px;
+}
+
+.message-table-title {
+	float: left;
+	font-weight: bold;
+}
+
+.message-table-time {
+	float: right;
+	margin-right: 20px;
+}
+
+.message-table-content {
+	margin-bottom: 10px;
+	word-wrap: break-word;
+}
+
+.message-table a:hover {
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.message-table-a-top {
+	margin-bottom: 4px;
+}
+
+.message-table-a-bottom {
+	margin-top: 4px;
+}
+.black-bold {
+	color: #000000;
+	font-weight: bold;
+}
+
+/*表单验证相关class*/
+.error{
+	color: red;
+}
+span.help-inline {
+	display: inline;
+	color: red;
+	padding-left: 5px;
+}
+span.help-block {
+	display: block;
+	color: red;
+	padding-left: 5px;
+	margin-top: 5px;
+}
+
+span.wrap-line {
+	margin-left: 120px;
+}
+
+select[name='year1'] ,select[name='month1'] ,select[name='day1']{
+	height: 24px;
+}
+
+/*单据信息统计*/
+
+
+/*基本信息*/
+.textspan {
+	margin-top: 5px;
+    display: inline-block;
+}
