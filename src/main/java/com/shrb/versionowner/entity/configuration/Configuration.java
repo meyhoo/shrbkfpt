@@ -8,8 +8,15 @@ public class Configuration {
     @Value("${configuration.filepath.userinfo}")
     private String userInfoFilePath;
 
+    @Value("${shiro.session.timeout}")
+    private Long shiroSessionTimeout;
+
     public String getUserInfoFilePath() {
         return userInfoFilePath;
+    }
+
+    public Long getShiroSessionTimeout() {
+        return shiroSessionTimeout;
     }
 
 }

@@ -188,14 +188,4 @@ public class MyFileUtils {
         fileChannel.close();
     }
 
-    public static void main(String[] args) throws Exception {
-        String srcPath = "D:/javaProjects/test.sql";
-        String destPath = "D:/javaProjects/test2.sql";
-        List<String> list = readFileAllLines(srcPath, "utf-8");
-
-        writeLineToFileFromTail(list, destPath, "utf-8");
-
-        //writeLinesToFileFromHead(readFileAllLines(srcPath, "utf-8"), destPath, "utf-8");
-
-    }
 }

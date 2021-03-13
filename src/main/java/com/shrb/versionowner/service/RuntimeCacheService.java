@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +19,14 @@ public class RuntimeCacheService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private BeforeRunAction beforeRunAction;
+
     private Map<String, User> userMap;
 
     @PostConstruct
-    private void init() {
+    private void init() throws Exception {
+        beforeRunAction.prepareUserInfoFile();
         this.userMap = initUserMap();
     }
 
@@ -37,5 +42,16 @@ public class RuntimeCacheService {
 
     public User getUser(String userName) {
         return this.userMap.get(userName);
+    }
+
+    public List<Map<String, Object>> getUserList() {
+        List<Map<String, Object>> userList = new ArrayList<>();
+        userMap.forEach((key, value) -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("userName", value.getUserName());
+            map.put("role", value.getRole());
+            userList.add(map);
+        });
+        return userList;
     }
 }

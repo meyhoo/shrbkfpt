@@ -10,13 +10,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" th:href="@{/frame/layui/css/layui.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="icon" th:href="@{/img/pageTitle.jpg}">
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
     <div class="layui-header my-header">
         <a href="/main">
-            <!--<img class="my-header-logo" src="" alt="logo">-->
             <div class="my-header-logo">欢迎您</div>
         </a>
         <div class="my-header-btn">
@@ -43,7 +41,7 @@
                     <img th:src="@{/img/pageTitle.jpg}" alt="logo">
                 </a>
                 <dl class="layui-nav-child">
-                    <dd><a href="/loginout"><i class="layui-icon">&#x1006;</i>退出</a></dd>
+                    <dd><a href="/user/logout"><i class="layui-icon">&#x1006;</i>退出</a></dd>
                 </dl>
             </li>
         </ul>
@@ -53,53 +51,53 @@
     <div class="layui-side my-side">
         <div class="layui-side-scroll">
             <ul class="layui-nav layui-nav-tree" lay-filter="side-main">
-                <li class="layui-nav-item  layui-nav-itemed" id="education">
-                    <a href="javascript:;"><i class="layui-icon">&#xe620;</i>业务处理</a>
+                <li class="layui-nav-item  layui-nav-itemed" id="developer">
+                    <a href="javascript:;"><i class="layui-icon">&#xe620;</i>开发者</a>
                     <dl class="layui-nav-child">
                         <dd>
                             <a href="javascript:;" href-url="/business/getSellerAppointmentList">
                                 <i class="layui-icon">&#xe621;</i>
-                                卖家预约
+                                提交版本
                             </a>
                         </dd>
                         <dd>
                             <a href="javascript:;" href-url="/business/getBuyerAppointmentList">
                                 <i class="layui-icon">&#xe621;</i>
-                                买家预约
+                                SQL生成
                             </a>
                         </dd>
                     </dl>
                 </li>
-                <li class="layui-nav-item  layui-nav-itemed" id="student">
-                    <a href="javascript:;"><i class="layui-icon">&#xe620;</i>平台管理</a>
+                <li class="layui-nav-item  layui-nav-itemed" id="administrator" th:if="${role==1}">
+                    <a href="javascript:;"><i class="layui-icon">&#xe620;</i>管理者</a>
                     <dl class="layui-nav-child">
                         <dd>
                             <a href="javascript:;" href-url="/platform/manager">
                                 <i class="layui-icon">&#xe621;</i>
-                                轮播图管理
+                                版本管理
                             </a>
                         </dd>
                         <dd>
                             <a href="javascript:;" href-url="/platform/activity">
                                 <i class="layui-icon">&#xe621;</i>
-                                活动管理
-                            </a>
-                        </dd>
-                        <dd>
-                            <a href="javascript:;" href-url="/platform/area">
-                                <i class="layui-icon">&#xe621;</i>
-                                地点管理
+                                团队管理
                             </a>
                         </dd>
                     </dl>
                 </li>
                 <li class="layui-nav-item">
-                    <a href="javascript:;"><i class="layui-icon">&#xe628;</i>系统管理</a>
+                    <a href="javascript:;"><i class="layui-icon">&#xe628;</i>公共管理</a>
                     <dl class="layui-nav-child">
                         <dd>
                             <a href="javascript:;" href-url="/system/getAccountList">
                                 <i class="layui-icon">&#xe621;</i>
-                                账号管理
+                                环境清单
+                            </a>
+                        </dd>
+                        <dd>
+                            <a href="javascript:;" href-url="/system/getAccountList">
+                                <i class="layui-icon">&#xe621;</i>
+                                SQL模板
                             </a>
                         </dd>
                     </dl>
@@ -110,16 +108,16 @@
     </div>
     <!-- body -->
     <div class="layui-body my-body">
-        <div class="layui-tab layui-tab-card my-tab" lay-filter="card" lay-allowClose="true">
-            <ul class="layui-tab-title">
-                <li class="layui-this" lay-id="1"><span><i class="layui-icon">&#xe638;</i>欢迎页</span></li>
-            </ul>
-            <div class="layui-tab-content">
-                <div class="layui-tab-item layui-show">
-                    <iframe id="iframe" src="/resources/demo/welcome.html" frameborder="0"></iframe>
-                </div>
-            </div>
-        </div>
+<!--        <div class="layui-tab layui-tab-card my-tab" lay-filter="card" lay-allowClose="true">-->
+<!--            <ul class="layui-tab-title">-->
+<!--                <li class="layui-this" lay-id="1"><span><i class="layui-icon">&#xe638;</i>欢迎页</span></li>-->
+<!--            </ul>-->
+<!--            <div class="layui-tab-content">-->
+<!--                <div class="layui-tab-item layui-show">-->
+<!--                    <iframe id="iframe" src="/resources/demo/welcome.html" frameborder="0"></iframe>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
     <!-- footer -->
     <div class="layui-footer my-footer">

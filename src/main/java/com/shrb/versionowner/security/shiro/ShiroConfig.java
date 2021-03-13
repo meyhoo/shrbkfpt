@@ -26,10 +26,16 @@ public class ShiroConfig implements ApplicationContextAware {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         Map<String,String> filterChainDefinitionMap = new LinkedHashMap<>();
-        //配置不会被拦截的链接 顺序判断
+        //配置不会被拦截的url 顺序判断
+        filterChainDefinitionMap.put("/css/**", "anon");
+        filterChainDefinitionMap.put("/frame/**", "anon");
+        filterChainDefinitionMap.put("/img/**", "anon");
+        filterChainDefinitionMap.put("/js/**", "anon");
+        filterChainDefinitionMap.put("/", "anon");
+        filterChainDefinitionMap.put("/user/loginPage.html", "anon");
         filterChainDefinitionMap.put("/user/login", "anon");
-        //拦截其他所以接口
-        //filterChainDefinitionMap.put("/**", "authc");
+        //拦截其他url
+        filterChainDefinitionMap.put("/**", "authc");
         shiroFilterFactoryBean.setLoginUrl("/");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;

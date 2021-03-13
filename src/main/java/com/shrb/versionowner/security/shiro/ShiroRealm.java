@@ -33,7 +33,7 @@ public class ShiroRealm extends AuthorizingRealm {
         if(user==null){
             return null;
         }else{
-            SimpleAuthenticationInfo simpleAuthenticationInfo=new SimpleAuthenticationInfo(userName,user.getPassword(),getName());
+            SimpleAuthenticationInfo simpleAuthenticationInfo=new SimpleAuthenticationInfo(user, user.getPassword(), getName());
             return simpleAuthenticationInfo;
         }
     }

@@ -27,11 +27,14 @@ public class ProcessApiResponseAspect {
         log.info("{}方法开始执行", name);
         try {
             apiResponse = (ApiResponse)pjp.proceed();
+            apiResponse.setErrorCode(ErrorCodeEnums.success.getCode());
+            apiResponse.setErrorMsg(ErrorCodeEnums.success.getMsg());
         } catch (Throwable throwable) {
             apiResponse = new ApiResponse();
             apiResponse.setErrorCode(ErrorCodeEnums.failure.getCode());
             apiResponse.setErrorMsg(ErrorCodeEnums.failure.getMsg());
             log.error("{}方法出现异常...", name, throwable);
+            return apiResponse;
         }
         return apiResponse;
     }

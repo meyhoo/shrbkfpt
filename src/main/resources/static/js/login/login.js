@@ -1,6 +1,6 @@
 function loginAjax(){
     var account = $("#account").val();
-    var password = $("#password").val();
+    var password = md5($("#password").val());
     $.ajax({
         "url": xyc.common.basePath() + "/user/login",
         "contentType": "application/x-www-form-urlencoded",
@@ -10,19 +10,21 @@ function loginAjax(){
             "account": account,
             "password": password
         },
-        "dataType": "text",
+        "dataType": "json",
         "success": function (data, callback, settings) {
-            if(data=='03'){
-                shakeModal3();
-            }
-            if(data=='02'){
-                shakeModal2();
-            }
-            if(data=='01'){
-                shakeModal1();
-            }
-            if(data=='00'){
-                window.location.replace("/user/mainPage.html");
+            if(data.errorCode=='000000'){
+                if(data.data.resultCode=='00'){
+                    window.location.replace("/user/mainPage.html");
+                }
+                if(data.data.resultCode=='03'){
+                    shakeModal3();
+                }
+                if(data.data.resultCode=='02'){
+                    shakeModal2();
+                }
+                if(data.data.resultCode=='01'){
+                    shakeModal1();
+                }
             }
         },
         "error": function (data, callback, settings) {
