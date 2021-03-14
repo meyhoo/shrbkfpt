@@ -2,6 +2,7 @@ package com.shrb.versionowner.controller.user;
 
 import com.alibaba.fastjson.JSONObject;
 import com.shrb.versionowner.annotataions.ApiRsp;
+import com.shrb.versionowner.entity.api.ApiExtendResponse;
 import com.shrb.versionowner.entity.api.ApiResponse;
 import com.shrb.versionowner.entity.configuration.Configuration;
 import com.shrb.versionowner.service.RuntimeCacheService;
@@ -24,10 +25,11 @@ public class TeamUserController {
     @RequestMapping(value = "/searchUserList", method = RequestMethod.POST)
     @ResponseBody
     public ApiResponse searchUserList() {
-        ApiResponse apiResponse = new ApiResponse();
+        ApiExtendResponse apiResponse = new ApiExtendResponse();
         JSONObject dataObject = new JSONObject();
         dataObject.put("userList", runtimeCacheService.getUserList());
         apiResponse.setData(dataObject);
+        apiResponse.setDataMaxCount(1);
         return apiResponse;
     }
 }

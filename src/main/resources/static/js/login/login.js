@@ -1,3 +1,6 @@
+if (top != window){
+    top.location.href = window.location.href;
+}
 function loginAjax(){
     var account = $("#account").val();
     var password = md5($("#password").val());

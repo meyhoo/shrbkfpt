@@ -1,6 +1,13 @@
 package com.shrb.versionowner.entity.api;
 
-public class ApiResponse {
+import com.alibaba.fastjson.JSONObject;
+
+import java.io.Serializable;
+
+public class ApiResponse extends AbstractResponse implements Serializable {
+
+    private static final long serialVersionUID = 5750308905528388534L;
+
     private String errorCode;
     private String errorMsg;
     private Object data;
@@ -27,5 +34,9 @@ public class ApiResponse {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public String toString(){
+        return JSONObject.toJSONString(this);
     }
 }

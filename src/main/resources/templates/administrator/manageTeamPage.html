@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>团队管理</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap-3.3.5.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap-datetimepicker.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/font-awesome/css/font-awesome.css}" />
+    <link rel="stylesheet" th:href="@{/frame/dataTables/theme/dataTables.bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/index2.css}" />
+</head>
+<body ms-controller="bodyController">
+<div id="content" class="mycontainer" ms-if="showDialog == 'main'">
+    <!-- 标题 -->
+    <div class="mycontainer-title">
+        <span class="mycontainer-title-icon"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+        <span class="mycontainer-title-text">查询信息</span>
+    </div>
+
+    <!-- 查询条件 -->
+    <div class="mycontainer-search">
+        <div class="mycontainer-search-row">
+            <span class="search-text">成员：</span>
+            <span class="search-input">
+				<input type="text" class="search-input width200" ms-duplex="sendParams.userName" />
+			</span>
+            <span class="search-text mgl20">角色类型：</span>
+            <span class="search-input">
+				<select class="search-input width200" ms-duplex="sendParams.role">
+					<option value="">全部</option>
+					<option value="1">管理者</option>
+					<option value="2">开发者</option>
+				</select>
+			</span>
+        </div>
+
+
+        <!-- 查询按钮 -->
+        <div class="mycontainer-search-btn">
+            <input class="btn btn-primary btn-sm" type="button" value="查询" ms-click="searchAction" />
+            <input class="btn btn-default btn-sm" type="button" value="清空" ms-click="resetAction" />
+        </div>
+    </div>
+
+    <!-- 表格操作按钮 这些按钮都是批量操作 -->
+    <div class="mycontainer-button">
+        <input class="btn btn-primary btn-sm" type="button" value="刷新" ms-click="searchAction" />
+        <input class="btn btn-primary btn-sm" type="button" value="新增" ms-click="changeDialog('add')" />
+        <input class="btn btn-primary btn-sm" type="button" value="删除" ms-click="doDeletes" />
+    </div>
+
+    <!-- 表格 -->
+    <div class="mycontainer-table">
+        <table id="tableList" class="table table-striped table-bordered" cellspacing="0" width="100%"></table>
+    </div>
+</div>
+
+<div class="dialog-content" ms-if="showDialog == 'sub'">
+    <iframe id="subFrame" src="" frameborder='0' style="width: 100%; height: 100%;"></iframe>
+</div>
+
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-3.3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-datetimepicker.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-datetimepicker.zh-CN.js}"></script>
+<script type="text/javascript" th:src="@{/frame/dataTables/jquery.dataTables-1.10.8.min.js}"></script>
+<script type="text/javascript" th:src="@{/frame/dataTables/dataTables.bootstrap-1.10.8.min.js}"></script>
+<script type="text/javascript" th:src="@{/frame/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/clds.layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/json2.js}"></script>
+<script type="text/javascript" th:src="@{/js/avalon.js}"></script>
+<script type="text/javascript" th:src="@{/js/xycims.js}"></script>
+<script type="text/javascript" th:src="@{/js/administrator/manageTeamPage.js}"></script>
+</body>
+</html>

@@ -1,7 +1,11 @@
 package com.shrb.versionowner.aop;
 
+import com.alibaba.fastjson.JSONObject;
+import com.shrb.versionowner.entity.api.AbstractResponse;
+import com.shrb.versionowner.entity.api.ApiExtendResponse;
 import com.shrb.versionowner.entity.api.ApiResponse;
 import com.shrb.versionowner.enums.ErrorCodeEnums;
+import com.shrb.versionowner.utils.WebHttpUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -9,6 +13,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
 
 @Aspect
 @Component
@@ -22,18 +31,22 @@ public class ProcessApiResponseAspect {
 
     @Around("apiResponsePointcut()")
     public Object aroundApiRsp(ProceedingJoinPoint pjp) {
-        ApiResponse apiResponse;
+        AbstractResponse apiResponse;
         String name = pjp.getSignature().getName();
-        log.info("{}方法开始执行", name);
         try {
-            apiResponse = (ApiResponse)pjp.proceed();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            JSONObject params = WebHttpUtils.getHttpRequestJson(request);
+            String requestUrl = request.getMethod() + " " + request.getRequestURL();
+            log.info("[服务器收到请求：{}] ==>[请求报文：{}] ==>[{}方法开始执行]", requestUrl, params.toJSONString(), name);
+            apiResponse = (AbstractResponse)pjp.proceed();
             apiResponse.setErrorCode(ErrorCodeEnums.success.getCode());
             apiResponse.setErrorMsg(ErrorCodeEnums.success.getMsg());
+            log.info("[{}方法执行结束] ==>[返回响应报文：{}]", name, apiResponse.toString());
         } catch (Throwable throwable) {
-            apiResponse = new ApiResponse();
+            apiResponse = new ApiExtendResponse();
             apiResponse.setErrorCode(ErrorCodeEnums.failure.getCode());
             apiResponse.setErrorMsg(ErrorCodeEnums.failure.getMsg());
-            log.error("{}方法出现异常...", name, throwable);
+            log.error("[{}方法出现异常...] ==>[返回响应报文：{}]", name, apiResponse.toString(), throwable);
             return apiResponse;
         }
         return apiResponse;

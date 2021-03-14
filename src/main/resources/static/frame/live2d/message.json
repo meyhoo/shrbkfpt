@@ -1,0 +1,14 @@
+{
+    "mouseover": [
+        {
+            "selector": "#landlord #live2d",
+            "text": ["Hello~~，我是小助手，欢迎使用versionOwner控制台", "需要帮助时，戳一下我就好了", "需要帮助时，戳一下我就好了"]
+        }
+    ],
+    "click": [
+        {
+            "selector": "#landlord #live2d",
+            "text": ["如果你要提交版本，记得要勾选对应的版本批次哦~", "如果有系统请求url需要新增或修改，<br>可以使用【环境清单】来配置哦~"]
+        }
+    ]
+}
