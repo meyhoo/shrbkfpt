@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class RuntimeCacheService {
@@ -52,6 +49,21 @@ public class RuntimeCacheService {
             map.put("role", value.getRole());
             userList.add(map);
         });
+        Collections.sort(userList, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                int i = o1.get("userName").toString().compareTo(o2.get("userName").toString());
+                return i>0?1:-1;
+            }
+        });
         return userList;
+    }
+
+    public Map<String, User> getUserMap() {
+        return userMap;
+    }
+
+    public void setUserMap(Map<String, User> userMap) {
+        this.userMap = userMap;
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 @RequestMapping("/user")
 public class TeamUserController {
@@ -24,7 +26,7 @@ public class TeamUserController {
     @ApiRsp
     @RequestMapping(value = "/searchUserList", method = RequestMethod.POST)
     @ResponseBody
-    public ApiResponse searchUserList() {
+    public ApiResponse searchUserList(HttpServletRequest request) {
         ApiExtendResponse apiResponse = new ApiExtendResponse();
         JSONObject dataObject = new JSONObject();
         dataObject.put("userList", runtimeCacheService.getUserList());
