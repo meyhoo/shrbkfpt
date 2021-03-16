@@ -33,4 +33,5 @@ public class UserRouteController {
         model.addAttribute("role", user.getRole());
         return USER_MAIN_HTML;
     }
+
 }

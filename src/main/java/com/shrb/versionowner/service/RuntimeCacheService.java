@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class RuntimeCacheService {
@@ -19,7 +20,7 @@ public class RuntimeCacheService {
     @Autowired
     private BeforeRunAction beforeRunAction;
 
-    private Map<String, User> userMap;
+    private ConcurrentHashMap<String, User> userMap;
 
     @PostConstruct
     private void init() throws Exception {
@@ -27,9 +28,9 @@ public class RuntimeCacheService {
         this.userMap = initUserMap();
     }
 
-    private Map<String, User> initUserMap() {
+    private ConcurrentHashMap<String, User> initUserMap() {
         try{
-            Map<String, User> map = userService.getUserMap();
+            ConcurrentHashMap<String, User> map = userService.getUserMap();
             return map;
         } catch (Exception e) {
             log.error("initUserMap failed. ", e);
@@ -59,11 +60,11 @@ public class RuntimeCacheService {
         return userList;
     }
 
-    public Map<String, User> getUserMap() {
+    public ConcurrentHashMap<String, User> getUserMap() {
         return userMap;
     }
 
-    public void setUserMap(Map<String, User> userMap) {
+    public void setUserMap(ConcurrentHashMap<String, User> userMap) {
         this.userMap = userMap;
     }
 }

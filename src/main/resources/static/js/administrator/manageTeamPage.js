@@ -23,7 +23,7 @@ window.tableObj = $('#tableList').DataTable({
         "dataSrc": function( json ){
             json.recordsTotal = json.dataMaxCount;
             json.recordsFiltered = json.dataMaxCount;
-            window.message = json.message;
+            window.message = json.errorMsg;
             return json.data;
         }
     },
@@ -34,8 +34,8 @@ window.tableObj = $('#tableList').DataTable({
         { title:'序号', name: '', data: null ,"render": function(data, type, row){
                 return "";
             }},
-        { title:'成员', name: 'userName', data: 'adminAccount' },
-        { title:'角色', name: 'adminType', data: 'adminType', "render": function ( data, type, row ) {
+        { title:'成员', name: 'userName', data: 'userName' },
+        { title:'角色', name: 'role', data: 'role', "render": function ( data, type, row ) {
                 var stateName = "";
                 if(data == "1") {
                     stateName = "管理者";
@@ -46,7 +46,7 @@ window.tableObj = $('#tableList').DataTable({
             }},
         { title:'操作', name: 'opration', data: null,"render": function ( data, type, row ) {
                 return 	"<a class='able-a' ms-click=\"changeDialog('edit', "+row.id+")\">修改密码</a>"+
-                    "<a class='able-a' ms-click=\"openDelete(\'"+row.adminAccount+"\')\">删除</a>";
+                    "<a class='able-a' ms-click=\"openDelete(\'"+row.userName+"\')\">删除</a>";
             }}
     ],
     "drawCallback": function(settings){
@@ -93,8 +93,8 @@ window.vmcontent = avalon.define({
         window.tableObj.ajax.reload();
     },
     resetAction: function(){
-        window.vmcontent.sendParams.hname = "";
-        window.vmcontent.sendParams.type = "";
+        window.vmcontent.sendParams.userName = "";
+        window.vmcontent.sendParams.role = "";
     },
 
     //批量删除
@@ -108,21 +108,28 @@ window.vmcontent = avalon.define({
         var selectedIds = [];
         $selected.each(function(){
             var data = window.tableObj.row($(this).parent().parent()).data();
-            selectedIds.push(data.adminAccount);
+            selectedIds.push(data.userName);
         });
         layer.confirm('删除后无法恢复，确定要删除所选元素吗？', {
             title: '提示',
             skin: 'layui-layer-style1',
             btn: ['确定','取消'] //按钮
         }, function(){
-            $.post(window.baseUrl + '/account/deleteAccounts', {adminAccounts: JSON.stringify(selectedIds)}, function(res){
-                if(res.isSuccess){
-                    clds_layer.msg("删除成功！", "info");
-                    window.tableObj.ajax.reload();
-                }else{
-                    clds_layer.msg(res.message, "error");
-                }
-            },"json");
+            $.post(
+                window.baseUrl + '/user/deleteUsers',
+                {
+                    userNames: JSON.stringify(selectedIds)
+                },
+                function(res){
+                    if(res.errorCode=='000000'){
+                        clds_layer.msg("删除成功！", "info");
+                        window.tableObj.ajax.reload();
+                    }else{
+                        clds_layer.msg(res.message, "error");
+                    }
+                },
+                "json"
+            );
         });
     },
 
@@ -134,12 +141,12 @@ window.vmcontent = avalon.define({
             btn: ['确定','取消'] //按钮
         }, function(){
             $.post(
-                window.baseUrl + '/account/deleteAccount',
+                window.baseUrl + '/user/deleteUser',
                 {
-                    adminAccount:param
+                    userName:param
                 },
                 function (res) {
-                    if (res.isSuccess) {
+                    if (res.errorCode=='000000') {
                         clds_layer.msg("删除成功！", "info");
                         window.tableObj.ajax.reload();
                     } else {
@@ -154,7 +161,7 @@ window.vmcontent = avalon.define({
     //新增或修改页面
     changeDialog: function(t, id) {
         if(t == "add"){
-            $("#subFrame").attr("src", window.baseUrl + "/system/getAccountAdd");
+            $("#subFrame").attr("src", window.baseUrl + "/administrator/addUserPage.html");
         }else if(t =="edit"){
             window.editData = window.tableObj.row($(this).parent().parent()).data();
             $("#subFrame").attr("src", window.baseUrl + "/system/getAccountEdit");

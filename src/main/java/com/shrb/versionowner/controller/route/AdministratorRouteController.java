@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/administrator")
 public class AdministratorRouteController {
     private final static String MANAGE_TEAM_HTML = "/administrator/manageTeamPage";
+    private final static String ADD_USER_HTML = "/administrator/addUserPage";
     private final static String MANAGE_VERSION_HTML = "/administrator/manageVersionPage";
 
     @RequestMapping("/manageTeamPage.html")
@@ -20,5 +21,8 @@ public class AdministratorRouteController {
         return MANAGE_TEAM_HTML;
     }
 
-
+    @RequestMapping("/addUserPage.html")
+    public String addUserPage() {
+        return ADD_USER_HTML;
+    }
 }

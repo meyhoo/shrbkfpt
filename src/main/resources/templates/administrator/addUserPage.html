@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加账号</title>
+    <link rel="stylesheet" th:href="@{/frame/zTree/css/zTreeStyle/zTreeStyle.css}"/>
+    <link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap-3.3.5.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap-datetimepicker.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/font-awesome/css/font-awesome.css}" />
+    <link rel="stylesheet" th:href="@{/frame/dataTables/theme/dataTables.bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/index2.css}" />
+</head>
+<body ms-controller="bodyController">
+
+<div id="content" class="mycontainer">
+
+    <!-- 标题 -->
+    <div class="mycontainer-title">
+        <span class="mycontainer-title-icon"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></span>
+        <span class="mycontainer-title-text">添加账号</span>
+        <span class="mycontainer-title-return"><input class="btn btn-default btn-sm" type="button" value="返回" ms-click="returnBack" /></span>
+    </div>
+
+    <form id="basic_validate">
+        <table class="form-table">
+            <tr>
+                <td width="200" align="center"><span><font class="red">*</font>账号:</span></td>
+                <td><span><input type="text" class="form-input" name="userName" ms-duplex="saveParams.userName" maxlength="50" style="width:250px"/></span></td>
+            </tr>
+            <tr>
+                <td align="center"><span><font class="red">*</font>密码:</span></td>
+                <td><span><input id="pwd" type="password" class="form-input" name="pwd" ms-duplex="saveParams.pwd" maxlength="50" style="width:250px"/></span></td>
+            </tr>
+            <tr>
+                <td align="center"><span><font class="red">*</font>确认密码:</span></td>
+                <td><span><input id="rePwd" type="password" class="form-input" name="rePwd"  maxlength="50" style="width:250px"/></span></td>
+            </tr>
+            <tr>
+                <td align="center"><span><font class="red">*</font>角色类型:</span></td>
+                <td>
+					<span class="search-input">
+					<select id="typeSelect" class="search-input width200" style="width: 100px" ms-duplex="saveParams.role" ms-change="typeChange">
+					    <option value="2">开发者</option>
+                        <option value="1">管理者</option>
+					</select>
+					</span>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <hr class="myhr"/>
+
+    <div>
+        <input class="btn btn-primary btn-sm" type="button" value="保存" ms-click="saveAction"/>
+    </div>
+
+</div>
+
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/frame/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-3.3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-datetimepicker.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-datetimepicker.zh-CN.js}"></script>
+<script type="text/javascript" th:src="@{/frame/dataTables/jquery.dataTables-1.10.8.min.js}"></script>
+<script type="text/javascript" th:src="@{/frame/dataTables/dataTables.bootstrap-1.10.8.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.validate.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.validate.common.js}"></script>
+<script type="text/javascript" th:src="@{/js/xycims.js}"></script>
+<script type="text/javascript" th:src="@{/js/md5.js}" ></script>
+<script type="text/javascript" th:src="@{/js/avalon.js}"></script>
+<script type="text/javascript" th:src="@{/frame/zTree/js/jquery.ztree.core-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/frame/zTree/js/jquery.ztree.excheck-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/administrator/addUserPage.js}"></script>
+</body>
+</html>

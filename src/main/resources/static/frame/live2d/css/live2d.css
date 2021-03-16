@@ -2,9 +2,9 @@
     user-select: none;
     position: fixed;
     left: 100px;
-    bottom: 100px;
-    width: 560px;
-    height: 500px;
+    bottom: 30px;
+    width: 280px;
+    height: 250px;
     z-index: 10000;
     font-size: 0;
     transition: all .3s ease-in-out;
