@@ -11,6 +11,9 @@ public class Configuration {
     @Value("${shiro.session.timeout}")
     private Long shiroSessionTimeout;
 
+    @Value("${configuration.filepath.sqlTemplates.basePath}")
+    private String sqlTemplatesBasePath;
+
     public String getUserInfoFilePath() {
         return userInfoFilePath;
     }
@@ -19,4 +22,7 @@ public class Configuration {
         return shiroSessionTimeout;
     }
 
+    public String getSqlTemplatesBasePath() {
+        return sqlTemplatesBasePath;
+    }
 }

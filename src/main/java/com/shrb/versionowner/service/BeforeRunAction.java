@@ -33,4 +33,10 @@ public class BeforeRunAction {
             MyFileUtils.writeLinesToFileFromHead(lines, path, "utf-8");
         }
     }
+
+    public void prepareSqlTemplateDir() throws Exception {
+        String basePath = configuration.getSqlTemplatesBasePath();
+        MyFileUtils.createFile(basePath);
+    }
+
 }

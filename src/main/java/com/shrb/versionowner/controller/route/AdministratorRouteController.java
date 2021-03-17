@@ -14,7 +14,7 @@ public class AdministratorRouteController {
     private final static String MANAGE_VERSION_HTML = "/administrator/manageVersionPage";
 
     @RequestMapping("/manageTeamPage.html")
-    public String mainPage(Model model) {
+    public String manageTeamPage(Model model) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
         model.addAttribute("userName", user.getUserName());
         model.addAttribute("role", user.getRole());

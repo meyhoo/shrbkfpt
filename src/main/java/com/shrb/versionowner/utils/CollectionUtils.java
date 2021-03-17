@@ -119,31 +119,4 @@ public class CollectionUtils<T> {
             this.from = from;
         }
     }
-
-    public static void main(String[] args) {
-        User user1 = new User();
-        user1.setUserName("admin");
-        user1.setRole(1);
-        User user2 = new User();
-        user2.setUserName("zhongzijie");
-        user2.setRole(2);
-        User user3 = new User();
-        user3.setUserName("xubingnan");
-        user3.setRole(2);
-        List<User> userList = new ArrayList<>();
-        userList.add(user1);
-        userList.add(user2);
-        userList.add(user3);
-        Map<String, Object> map = new HashMap<>();
-        map.put("userName", "zhongzijie");
-        map.put("role", "");
-        map.put("pageSize", 1);
-        map.put("from", 0);
-        CollectionUtils<User> collectionUtils = new CollectionUtils<User>(userList, map);
-//        List<User> resultList = collectionUtils.getListByFuzzyMatch();
-//        for(User currentUser : resultList) {
-//            System.out.println(currentUser.getUserName());
-//        }
-
-    }
 }

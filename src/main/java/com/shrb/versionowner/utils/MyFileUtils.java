@@ -13,7 +13,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 文件处理工具类
@@ -186,6 +189,57 @@ public class MyFileUtils {
             fileChannel.write(ByteBuffer.wrap((line+"\n").getBytes(Charset.forName(charset))));
         }
         fileChannel.close();
+    }
+
+    public static File[] listFile(String path) {
+        File file = new File(path);
+        return file.listFiles();
+    }
+
+    /**
+     * 列出文件夹下的所有文件或文件夹
+     * @param path
+     * @param args
+     * @return
+     */
+    public static List<String> listFilePath(String path, String...args) {
+        List<String> list = new ArrayList<>();
+        File file = new File(path);
+        File[] files = file.listFiles();
+        for(File currentFile : files) {
+            if(args.length == 0) {
+                list.add(currentFile.getAbsolutePath());
+                continue;
+            }
+            if("file".equals(args[0])) {
+                if(currentFile.isFile()) {
+                    list.add(currentFile.getAbsolutePath());
+                    continue;
+                }
+            }
+            if("dir".equals(args[0])) {
+                if(currentFile.isDirectory()) {
+                    list.add(currentFile.getAbsolutePath());
+                    continue;
+                }
+            }
+        }
+        return list;
+    }
+
+    public static void main(String[] args) {
+        String sql = "insert into hopesb.BUSSSERVICES(SERVICEID,CATEGORY,METHODNAME,ISAGE,DESCRIPTION) values ('#{serviceId}',null,null,'false','#{serviceId}');";
+        String s = "(#\\{)(.*?)(})";
+        Pattern r = Pattern.compile(s);
+        Matcher m = r.matcher(sql);
+        while (m.find()) {
+            /*
+             自动遍历打印所有结果   group方法打印捕获的组内容，以正则的括号角标从1开始计算，我们这里要第2个括号里的
+             值， 所以取 m.group(2)， m.group(0)取整个表达式的值，如果越界取m.group(4),则抛出异常
+           */
+            System.out.println("Found value: " + m.group(2));
+        }
+
     }
 
 }
