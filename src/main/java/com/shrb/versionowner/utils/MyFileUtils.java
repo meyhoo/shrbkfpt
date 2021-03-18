@@ -1,5 +1,6 @@
 package com.shrb.versionowner.utils;
 
+import com.shrb.versionowner.entity.business.User;
 import com.shrb.versionowner.entity.file.MyFile;
 import com.shrb.versionowner.entity.file.PathJudgeResult;
 import org.apache.commons.io.FileUtils;
@@ -10,13 +11,12 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicStampedReference;
 
 /**
  * 文件处理工具类
@@ -151,7 +151,7 @@ public class MyFileUtils {
      * @return
      * @throws Exception
      */
-    public static List<String> readFileAllLines(String path, String charset) throws Exception{
+    public static List<String> readFileAllLines(String path, String charset) throws Exception {
         PathJudgeResult pathJudgeResult = getPathJudgeResult(path);
         if (pathJudgeResult.getDirFlag()) {
             throw new Exception("this is a directory");
@@ -160,6 +160,32 @@ public class MyFileUtils {
             throw new Exception("file does not exists");
         }
         return Files.readAllLines(Paths.get(path), Charset.forName(charset));
+    }
+
+    public static String readFileToString(String path, String charset) throws Exception {
+        return convertLinesToString(readFileAllLines(path, charset));
+    }
+
+    public static String convertLinesToString(List<String> lines) {
+        StringBuffer sb = new StringBuffer();
+        for(int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (i != lines.size() - 1) {
+                sb.append(line).append("\n");
+            } else {
+                sb.append(line);
+            }
+        }
+        return sb.toString();
+    }
+
+    public static List<String> convertStringToLines(String content) {
+        String[] contents = content.split("\n");
+        List<String> lines = new ArrayList<>();
+        for (String line : contents) {
+            lines.add(line);
+        }
+        return lines;
     }
 
     /**
@@ -227,19 +253,18 @@ public class MyFileUtils {
         return list;
     }
 
-    public static void main(String[] args) {
-        String sql = "insert into hopesb.BUSSSERVICES(SERVICEID,CATEGORY,METHODNAME,ISAGE,DESCRIPTION) values ('#{serviceId}',null,null,'false','#{serviceId}');";
-        String s = "(#\\{)(.*?)(})";
-        Pattern r = Pattern.compile(s);
-        Matcher m = r.matcher(sql);
-        while (m.find()) {
-            /*
-             自动遍历打印所有结果   group方法打印捕获的组内容，以正则的括号角标从1开始计算，我们这里要第2个括号里的
-             值， 所以取 m.group(2)， m.group(0)取整个表达式的值，如果越界取m.group(4),则抛出异常
-           */
-            System.out.println("Found value: " + m.group(2));
+    /**
+     * 递归删除
+     * @param file
+     */
+    public static void deleteDirOrFile(File file) {
+        if(file.isDirectory()){
+            File[] files = file.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                deleteDirOrFile(files[i]);
+            }
         }
-
+        file.delete();
     }
 
 }

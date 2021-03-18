@@ -24,8 +24,8 @@ public class RuntimeCacheService {
     @Autowired
     private BeforeRunAction beforeRunAction;
 
-    private ConcurrentHashMap<String, User> userMap;
-    private ConcurrentHashMap<String, SqlTemplate> sqlTemplateMap;
+    private volatile ConcurrentHashMap<String, User> userMap;
+    private volatile ConcurrentHashMap<String, SqlTemplate> sqlTemplateMap;
 
     @PostConstruct
     private void init() throws Exception {
@@ -86,6 +86,7 @@ public class RuntimeCacheService {
         sqlTemplateMap.forEach((key, value) -> {
             Map<String, Object> map = new HashMap<>();
             map.put("templateId", value.getTemplateId());
+            map.put("templateInfo", value.getTemplateInfo());
             map.put("runSqlContent", value.getRunSqlContent());
             map.put("rollbackSqlContent", value.getRollbackSqlContent());
             sqlTemplateList.add(map);

@@ -5,11 +5,13 @@ import java.util.Set;
 
 public class SqlTemplate {
     private String templateId;
+    private String templateInfoFilePath;
+    private String templateInfo;
     private String runSqlFilePath;
-    private List<String> runSqlContent;
+    private String runSqlContent;
     private List<Set<String>> runSqlPlaceholders;
     private String rollbackSqlFilePath;
-    private List<String> rollbackSqlContent;
+    private String rollbackSqlContent;
     private List<Set<String>> rollbackSqlPlaceholders;
 
     public String getTemplateId() {
@@ -36,19 +38,19 @@ public class SqlTemplate {
         this.rollbackSqlFilePath = rollbackSqlFilePath;
     }
 
-    public List<String> getRunSqlContent() {
+    public String getRunSqlContent() {
         return runSqlContent;
     }
 
-    public void setRunSqlContent(List<String> runSqlContent) {
+    public void setRunSqlContent(String runSqlContent) {
         this.runSqlContent = runSqlContent;
     }
 
-    public List<String> getRollbackSqlContent() {
+    public String getRollbackSqlContent() {
         return rollbackSqlContent;
     }
 
-    public void setRollbackSqlContent(List<String> rollbackSqlContent) {
+    public void setRollbackSqlContent(String rollbackSqlContent) {
         this.rollbackSqlContent = rollbackSqlContent;
     }
 
@@ -66,5 +68,21 @@ public class SqlTemplate {
 
     public void setRollbackSqlPlaceholders(List<Set<String>> rollbackSqlPlaceholders) {
         this.rollbackSqlPlaceholders = rollbackSqlPlaceholders;
+    }
+
+    public String getTemplateInfo() {
+        return templateInfo;
+    }
+
+    public void setTemplateInfo(String templateInfo) {
+        this.templateInfo = templateInfo;
+    }
+
+    public String getTemplateInfoFilePath() {
+        return templateInfoFilePath;
+    }
+
+    public void setTemplateInfoFilePath(String templateInfoFilePath) {
+        this.templateInfoFilePath = templateInfoFilePath;
     }
 }

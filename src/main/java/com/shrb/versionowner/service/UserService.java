@@ -95,6 +95,7 @@ public class UserService {
 
     /**
      * 校验并添加用户，写入缓存和文件中
+     * 该方法用到了DCL
      * @param userName
      * @param password
      * @param role
@@ -114,6 +115,11 @@ public class UserService {
         user.setPassword(password);
         user.setRole(Integer.parseInt(role));
         synchronized (LockFactory.getLock("userInfo")) {
+            if (runtimeCacheService.getUser(userName) != null) {
+                apiResponse.setErrorCode("999999");
+                apiResponse.setErrorMsg("用户已存在");
+                return apiResponse;
+            }
             runtimeCacheService.getUserMap().put(userName, user);
             String line = userName + "|" + password + "|" + role;
             List<String> lines = new ArrayList<>();
@@ -133,7 +139,14 @@ public class UserService {
      */
     public ApiResponse deleteUser(String userName) throws Exception {
         ApiResponse apiResponse = new ApiResponse();
+        User user = runtimeCacheService.getUser(userName);
+        if (user == null) {
+            return apiResponse;
+        }
         synchronized (LockFactory.getLock("userInfo")) {
+            if (runtimeCacheService.getUser(userName) == null) {
+                return apiResponse;
+            }
             runtimeCacheService.getUserMap().remove(userName);
             rewriteUserInfoToFile();
         }
