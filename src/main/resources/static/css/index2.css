@@ -153,6 +153,11 @@ table .unable-a {
 	line-height: 24px;
 }
 
+.form-textarea {
+	height: 192px;
+	line-height: 24px;
+}
+
 .mycontainer-title-return {
 	float: right;
 	padding-right: 10px;

@@ -60,7 +60,7 @@ public class SqlTemplateController {
     @ResponseBody
     public ApiResponse updateSqlTemplate(HttpServletRequest request) throws Exception {
         JSONObject requestJson = WebHttpUtils.getHttpRequestJson(request);
-        //TODO xxx
-        return null;
+        ApiResponse apiResponse = sqlTemplateService.updateSqlTemplate(requestJson);
+        return apiResponse;
     }
 }

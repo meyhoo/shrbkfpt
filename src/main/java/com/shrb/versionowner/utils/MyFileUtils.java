@@ -122,7 +122,6 @@ public class MyFileUtils {
         if (pathJudgeResult.getExistFlag()) {
             return;
         }
-
         if (pathJudgeResult.getDirFlag()) {
             File dir = new File(path);
             dir.mkdirs();

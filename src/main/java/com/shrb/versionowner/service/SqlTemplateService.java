@@ -51,7 +51,7 @@ public class SqlTemplateService {
         List<String> dirList = MyFileUtils.listFilePath(basePath, "dir");
         for(String dirPath : dirList) {
             File dir = new File(dirPath);
-            String templateInfoFilePath = dirPath + File.separator + TEMPLATE_INFO_FILE_NAME;
+            String templateInfoFilePath = dirPath + "/" + TEMPLATE_INFO_FILE_NAME;
             File templateInfoFile = new File(templateInfoFilePath);
             String templateInfo;
             if (!templateInfoFile.exists()) {
@@ -63,7 +63,7 @@ public class SqlTemplateService {
             SqlTemplate sqlTemplate = new SqlTemplate();
             sqlTemplate.setTemplateId(templateId);
             sqlTemplate.setTemplateInfo(templateInfo);
-            String runSqlFilePath = dirPath+File.separator+RUN_SQL_FILE_NAME;
+            String runSqlFilePath = dirPath + "/" + RUN_SQL_FILE_NAME;
             List<String> runSqlContentList = MyFileUtils.readFileAllLines(runSqlFilePath, "utf-8");
             List<Set<String>> runSqlPlaceholders = new ArrayList<>();
             String runSqlContent = MyFileUtils.convertLinesToString(runSqlContentList);
@@ -78,7 +78,7 @@ public class SqlTemplateService {
             sqlTemplate.setRunSqlFilePath(runSqlFilePath);
             sqlTemplate.setRunSqlContent(runSqlContent);
             sqlTemplate.setRunSqlPlaceholders(runSqlPlaceholders);
-            String rollbackSqlFilePath = dirPath+File.separator+ROLLBACK_SQL_FILE_NAME;
+            String rollbackSqlFilePath = dirPath + "/" + ROLLBACK_SQL_FILE_NAME;
             List<String> rollbackSqlContentList = MyFileUtils.readFileAllLines(rollbackSqlFilePath, "utf-8");
             List<Set<String>> rollbackSqlPlaceholders = new ArrayList<>();
             String rollbackSqlContent = MyFileUtils.convertLinesToString(rollbackSqlContentList);
@@ -136,9 +136,9 @@ public class SqlTemplateService {
         sqlTemplate.setRunSqlContent(runSqlContent);
         sqlTemplate.setRollbackSqlContent(rollbackSqlContent);
         String basePath = configuration.getSqlTemplatesBasePath();
-        String templateInfoFilePath = basePath+templateId + File.separator + TEMPLATE_INFO_FILE_NAME;
-        String runSqlFilePath = basePath+templateId+File.separator+RUN_SQL_FILE_NAME;
-        String rollbackSqlFilePath = basePath+templateId+File.separator+ROLLBACK_SQL_FILE_NAME;
+        String templateInfoFilePath = basePath+templateId + "/" + TEMPLATE_INFO_FILE_NAME;
+        String runSqlFilePath = basePath+templateId + "/" + RUN_SQL_FILE_NAME;
+        String rollbackSqlFilePath = basePath+templateId + "/" + ROLLBACK_SQL_FILE_NAME;
         sqlTemplate.setTemplateInfoFilePath(templateInfoFilePath);
         sqlTemplate.setRunSqlFilePath(runSqlFilePath);
         sqlTemplate.setRollbackSqlFilePath(rollbackSqlFilePath);
@@ -183,18 +183,18 @@ public class SqlTemplateService {
         return apiResponse;
     }
 
-    public ApiResponse updateSqlTemplate(Map<String, String> map) throws Exception {
+    public ApiResponse updateSqlTemplate(JSONObject jsonObject) throws Exception {
         ApiResponse apiResponse = new ApiResponse();
-        String templateId = map.get("templateId");
+        String templateId = jsonObject.getString("templateId");
         SqlTemplate sqlTemplate = runtimeCacheService.getSqlTemplate(templateId);
         if (sqlTemplate == null) {
             apiResponse.setErrorCode("999999");
             apiResponse.setErrorMsg("sql模板已存在");
             return apiResponse;
         }
-        String templateInfo = map.get("templateInfo");
-        String runSqlContent = map.get("runSqlContent");
-        String rollbackSqlContent = map.get("rollbackSqlContent");
+        String templateInfo = jsonObject.getString("templateInfo");
+        String runSqlContent = jsonObject.getString("runSqlContent");
+        String rollbackSqlContent = jsonObject.getString("rollbackSqlContent");
 
         //修改缓存并改写目录下的文件
         synchronized (LockFactory.getLock("sqltemplate")) {
