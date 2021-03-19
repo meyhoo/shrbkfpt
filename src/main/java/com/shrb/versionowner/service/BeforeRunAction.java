@@ -39,4 +39,9 @@ public class BeforeRunAction {
         MyFileUtils.createFile(basePath);
     }
 
+    public void prepareSqlTemplateGroupDir() throws Exception {
+        String basePath = configuration.getSqlTemplateGroupBasePath();
+        MyFileUtils.createFile(basePath);
+    }
+
 }

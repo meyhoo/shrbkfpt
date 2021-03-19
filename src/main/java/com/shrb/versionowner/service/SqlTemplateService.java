@@ -14,14 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class SqlTemplateService {
@@ -32,9 +29,9 @@ public class SqlTemplateService {
 
     private static final String ROLLBACK_SQL_FILE_NAME = "rollback.sql";
 
-    private static final String TEMPLATE_INFO_FILE_NAME = "templateInfo.sql";
+    private static final String TEMPLATE_INFO_FILE_NAME = "templateInfo.dat";
 
-    private static final Pattern pattern = Pattern.compile("(#\\{)(.*?)(})");
+
 
     @Autowired
     private Configuration configuration;
@@ -63,36 +60,17 @@ public class SqlTemplateService {
             SqlTemplate sqlTemplate = new SqlTemplate();
             sqlTemplate.setTemplateId(templateId);
             sqlTemplate.setTemplateInfo(templateInfo);
+            sqlTemplate.setTemplateInfoFilePath(templateInfoFilePath);
             String runSqlFilePath = dirPath + "/" + RUN_SQL_FILE_NAME;
             List<String> runSqlContentList = MyFileUtils.readFileAllLines(runSqlFilePath, "utf-8");
-            List<Set<String>> runSqlPlaceholders = new ArrayList<>();
             String runSqlContent = MyFileUtils.convertLinesToString(runSqlContentList);
-            for(String line : runSqlContentList) {
-                Set<String> set = new HashSet<>();
-                Matcher m = pattern.matcher(line);
-                while (m.find()) {
-                    set.add(m.group(2));
-                }
-                runSqlPlaceholders.add(set);
-            }
             sqlTemplate.setRunSqlFilePath(runSqlFilePath);
             sqlTemplate.setRunSqlContent(runSqlContent);
-            sqlTemplate.setRunSqlPlaceholders(runSqlPlaceholders);
             String rollbackSqlFilePath = dirPath + "/" + ROLLBACK_SQL_FILE_NAME;
             List<String> rollbackSqlContentList = MyFileUtils.readFileAllLines(rollbackSqlFilePath, "utf-8");
-            List<Set<String>> rollbackSqlPlaceholders = new ArrayList<>();
             String rollbackSqlContent = MyFileUtils.convertLinesToString(rollbackSqlContentList);
-            for(String line : rollbackSqlContentList) {
-                Set<String> set = new HashSet<>();
-                Matcher m = pattern.matcher(line);
-                while (m.find()) {
-                    set.add(m.group(2));
-                }
-                rollbackSqlPlaceholders.add(set);
-            }
             sqlTemplate.setRollbackSqlFilePath(rollbackSqlFilePath);
             sqlTemplate.setRollbackSqlContent(rollbackSqlContent);
-            sqlTemplate.setRollbackSqlPlaceholders(rollbackSqlPlaceholders);
             sqlTemplateMap.put(templateId, sqlTemplate);
         }
         return sqlTemplateMap;
@@ -143,27 +121,7 @@ public class SqlTemplateService {
         sqlTemplate.setRunSqlFilePath(runSqlFilePath);
         sqlTemplate.setRollbackSqlFilePath(rollbackSqlFilePath);
         List<String> runSqlContentList = MyFileUtils.convertStringToLines(runSqlContent);
-        List<Set<String>> runSqlPlaceholders = new ArrayList<>();
-        for(String line : runSqlContentList) {
-            Set<String> set = new HashSet<>();
-            Matcher m = pattern.matcher(line);
-            while (m.find()) {
-                set.add(m.group(2));
-            }
-            runSqlPlaceholders.add(set);
-        }
         List<String> rollbackSqlContentList = MyFileUtils.convertStringToLines(rollbackSqlContent);
-        List<Set<String>> rollbackSqlPlaceholders = new ArrayList<>();
-        for(String line : rollbackSqlContentList) {
-            Set<String> set = new HashSet<>();
-            Matcher m = pattern.matcher(line);
-            while (m.find()) {
-                set.add(m.group(2));
-            }
-            rollbackSqlPlaceholders.add(set);
-        }
-        sqlTemplate.setRunSqlPlaceholders(runSqlPlaceholders);
-        sqlTemplate.setRollbackSqlPlaceholders(rollbackSqlPlaceholders);
         synchronized (LockFactory.getLock("sqltemplate")) {
             if (runtimeCacheService.getSqlTemplate(templateId) != null) {
                 apiResponse.setErrorCode("999999");
@@ -189,7 +147,7 @@ public class SqlTemplateService {
         SqlTemplate sqlTemplate = runtimeCacheService.getSqlTemplate(templateId);
         if (sqlTemplate == null) {
             apiResponse.setErrorCode("999999");
-            apiResponse.setErrorMsg("sql模板已存在");
+            apiResponse.setErrorMsg("sql模板不存在");
             return apiResponse;
         }
         String templateInfo = jsonObject.getString("templateInfo");
@@ -199,24 +157,22 @@ public class SqlTemplateService {
         //修改缓存并改写目录下的文件
         synchronized (LockFactory.getLock("sqltemplate")) {
             runtimeCacheService.getSqlTemplateMap().put(templateId, sqlTemplate);
-            if (!StringUtils.isEmpty(templateInfo)) {
-                sqlTemplate.setTemplateInfo(templateInfo);
-                String templateInfoFilePath = sqlTemplate.getTemplateInfoFilePath();
-                List<String> templateInfoLines = MyFileUtils.convertStringToLines(templateInfo);
-                MyFileUtils.writeLinesToFileFromHead(templateInfoLines, templateInfoFilePath, "utf-8");
-            }
-            if (!StringUtils.isEmpty(runSqlContent)) {
-                sqlTemplate.setRunSqlContent(runSqlContent);
-                String runSqlFilePath = sqlTemplate.getRunSqlFilePath();
-                List<String> runSqlLines = MyFileUtils.convertStringToLines(runSqlContent);
-                MyFileUtils.writeLinesToFileFromHead(runSqlLines, runSqlFilePath, "utf-8");
-            }
-            if (!StringUtils.isEmpty(rollbackSqlContent)) {
-                sqlTemplate.setRollbackSqlContent(rollbackSqlContent);
-                String rollbackSqlFilePath = sqlTemplate.getRollbackSqlFilePath();
-                List<String> rollbackSqlLines = MyFileUtils.convertStringToLines(rollbackSqlContent);
-                MyFileUtils.writeLinesToFileFromHead(rollbackSqlLines, rollbackSqlFilePath, "utf-8");
-            }
+
+            sqlTemplate.setTemplateInfo(templateInfo);
+            String templateInfoFilePath = sqlTemplate.getTemplateInfoFilePath();
+            List<String> templateInfoLines = MyFileUtils.convertStringToLines(templateInfo);
+            MyFileUtils.writeLinesToFileFromHead(templateInfoLines, templateInfoFilePath, "utf-8");
+
+            sqlTemplate.setRunSqlContent(runSqlContent);
+            String runSqlFilePath = sqlTemplate.getRunSqlFilePath();
+            List<String> runSqlLines = MyFileUtils.convertStringToLines(runSqlContent);
+            MyFileUtils.writeLinesToFileFromHead(runSqlLines, runSqlFilePath, "utf-8");
+
+            sqlTemplate.setRollbackSqlContent(rollbackSqlContent);
+            String rollbackSqlFilePath = sqlTemplate.getRollbackSqlFilePath();
+            List<String> rollbackSqlLines = MyFileUtils.convertStringToLines(rollbackSqlContent);
+            MyFileUtils.writeLinesToFileFromHead(rollbackSqlLines, rollbackSqlFilePath, "utf-8");
+
         }
         return apiResponse;
     }
@@ -256,4 +212,6 @@ public class SqlTemplateService {
         }
         return apiResponse;
     }
+
+
 }

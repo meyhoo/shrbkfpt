@@ -14,6 +14,9 @@ public class Configuration {
     @Value("${configuration.filepath.sqlTemplates.basePath}")
     private String sqlTemplatesBasePath;
 
+    @Value("${configuration.filepath.sqlTemplateGroup.basePath}")
+    private String sqlTemplateGroupBasePath;
+
     public String getUserInfoFilePath() {
         return userInfoFilePath;
     }
@@ -24,5 +27,9 @@ public class Configuration {
 
     public String getSqlTemplatesBasePath() {
         return sqlTemplatesBasePath;
+    }
+
+    public String getSqlTemplateGroupBasePath() {
+        return sqlTemplateGroupBasePath;
     }
 }
