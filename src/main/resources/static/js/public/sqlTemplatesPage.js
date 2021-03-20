@@ -110,7 +110,7 @@ window.vmcontent = avalon.define({
             $.post(
                 window.baseUrl + '/public/deleteSqlTemplates',
                 {
-                    userNames: JSON.stringify(selectedIds)
+                    sqlTemplates: JSON.stringify(selectedIds)
                 },
                 function(res){
                     if(res.errorCode=='000000'){

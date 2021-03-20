@@ -156,8 +156,6 @@ public class SqlTemplateService {
 
         //修改缓存并改写目录下的文件
         synchronized (LockFactory.getLock("sqltemplate")) {
-            runtimeCacheService.getSqlTemplateMap().put(templateId, sqlTemplate);
-
             sqlTemplate.setTemplateInfo(templateInfo);
             String templateInfoFilePath = sqlTemplate.getTemplateInfoFilePath();
             List<String> templateInfoLines = MyFileUtils.convertStringToLines(templateInfo);
@@ -173,6 +171,7 @@ public class SqlTemplateService {
             List<String> rollbackSqlLines = MyFileUtils.convertStringToLines(rollbackSqlContent);
             MyFileUtils.writeLinesToFileFromHead(rollbackSqlLines, rollbackSqlFilePath, "utf-8");
 
+            runtimeCacheService.getSqlTemplateMap().put(templateId, sqlTemplate);
         }
         return apiResponse;
     }
@@ -188,7 +187,7 @@ public class SqlTemplateService {
                 return apiResponse;
             }
             runtimeCacheService.getSqlTemplateMap().remove(templateId);
-            String dirPath = configuration.getSqlTemplatesBasePath() + sqlTemplate.getTemplateId();
+            String dirPath = configuration.getSqlTemplatesBasePath() + templateId;
             File dir = new File(dirPath);
             MyFileUtils.deleteDirOrFile(dir);
         }
@@ -205,7 +204,7 @@ public class SqlTemplateService {
                     continue;
                 }
                 runtimeCacheService.getSqlTemplateMap().remove(templateId);
-                String dirPath = configuration.getSqlTemplatesBasePath() + sqlTemplate.getTemplateId();
+                String dirPath = configuration.getSqlTemplatesBasePath() + templateId;
                 File dir = new File(dirPath);
                 MyFileUtils.deleteDirOrFile(dir);
             }

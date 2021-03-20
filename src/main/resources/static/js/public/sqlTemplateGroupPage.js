@@ -12,7 +12,7 @@ window.tableObj = $('#tableList').DataTable({
         sUrl: window.baseUrl + "/frame/dataTables/Chinese.json"
     },
     "ajax":{						//ajax请求地址
-        "url" : window.baseUrl + '/public/searchSqlTemplateList',
+        "url" : window.baseUrl + '/public/searchSqlTemplateGroupList',
         "type" : "post",
         "data": function ( req ) {
             window.vmcontent.sendParams.draw = req.draw;
@@ -34,8 +34,8 @@ window.tableObj = $('#tableList').DataTable({
         { title:'序号', name: '', data: null ,"render": function(data, type, row){
                 return "";
             }},
-        { title:'模板名称', name: 'templateId', data: 'templateId' },
-        { title:'中文说明', name: 'templateInfo', data: 'templateInfo' },
+        { title:'模板组名称', name: 'templateGroupId', data: 'templateGroupId' },
+        { title:'中文说明', name: 'templateGroupInfo', data: 'templateGroupInfo' },
         { title:'操作', name: 'opration', data: null,"render": function ( data, type, row ) {
                 return 	"<a class='able-a' ms-click=\"changeDialog('edit', "+row.id+")\">修改</a>"+
                     "<a class='able-a' ms-click=\"openDelete(\'"+row.userName+"\')\">删除</a>";
@@ -78,15 +78,13 @@ window.vmcontent = avalon.define({
     $id: "bodyController",
     showDialog: "main",
     sendParams: {
-        templateId: "",
-        templateInfo: ""
+        templateGroupId: ""
     },
     searchAction: function(){
         window.tableObj.ajax.reload();
     },
     resetAction: function(){
-        window.vmcontent.sendParams.templateId = "";
-        window.vmcontent.sendParams.templateInfo = "";
+        window.vmcontent.sendParams.templateGroupId = "";
     },
 
     //批量删除
@@ -100,7 +98,7 @@ window.vmcontent = avalon.define({
         var selectedIds = [];
         $selected.each(function(){
             var data = window.tableObj.row($(this).parent().parent()).data();
-            selectedIds.push(data.templateId);
+            selectedIds.push(data.templateGroupId);
         });
         layer.confirm('删除后无法恢复，确定要删除所选元素吗？', {
             title: '提示',
@@ -108,9 +106,9 @@ window.vmcontent = avalon.define({
             btn: ['确定','取消'] //按钮
         }, function(){
             $.post(
-                window.baseUrl + '/public/deleteSqlTemplates',
+                window.baseUrl + '/public/deleteSqlTemplateGroups',
                 {
-                    userNames: JSON.stringify(selectedIds)
+                    sqlTemplateGroups: JSON.stringify(selectedIds)
                 },
                 function(res){
                     if(res.errorCode=='000000'){
@@ -133,9 +131,9 @@ window.vmcontent = avalon.define({
             btn: ['确定','取消'] //按钮
         }, function(){
             $.post(
-                window.baseUrl + '/public/deleteSqlTemplate',
+                window.baseUrl + '/public/deleteSqlTemplateGroup',
                 {
-                    templateId:param
+                    templateGroupId:param
                 },
                 function (res) {
                     if (res.errorCode=='000000') {
@@ -153,10 +151,10 @@ window.vmcontent = avalon.define({
     //新增或修改页面
     changeDialog: function(t, id) {
         if(t == "add"){
-            $("#subFrame").attr("src", window.baseUrl + "/public/addSqlTemplatePage.html");
+            $("#subFrame").attr("src", window.baseUrl + "/public/addSqlTemplateGroupPage.html");
         }else if(t =="edit"){
             window.editData = window.tableObj.row($(this).parent().parent()).data();
-            $("#subFrame").attr("src", window.baseUrl + "/public/editSqlTemplatePage.html");
+            $("#subFrame").attr("src", window.baseUrl + "/public/editSqlTemplateGroupPage.html");
         }
         if(t == "main"){
             window.vmcontent.showDialog = "main";

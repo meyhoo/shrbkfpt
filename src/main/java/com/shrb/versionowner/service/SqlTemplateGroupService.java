@@ -1,10 +1,12 @@
 package com.shrb.versionowner.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.shrb.versionowner.entity.api.ApiExtendResponse;
 import com.shrb.versionowner.entity.api.ApiResponse;
 import com.shrb.versionowner.entity.business.SqlTemplateGroup;
 import com.shrb.versionowner.entity.configuration.Configuration;
+import com.shrb.versionowner.entity.file.MyFile;
 import com.shrb.versionowner.lock.LockFactory;
 import com.shrb.versionowner.utils.CollectionUtils;
 import com.shrb.versionowner.utils.MyFileUtils;
@@ -135,7 +137,57 @@ public class SqlTemplateGroupService {
             return apiResponse;
         }
         String templateGroupInfo = jsonObject.getString("templateGroupInfo");
-        //TODO xxx
+        String templateIds = jsonObject.getString("templateIds");
+
+        synchronized (LockFactory.getLock("sqltemplategroup")) {
+            sqlTemplateGroup.setTemplateGroupInfo(templateGroupInfo);
+            String templateGroupInfoFilePath = sqlTemplateGroup.getTemplateGroupInfoFilePath();
+            List<String> templateGroupInfoLines = MyFileUtils.convertStringToLines(templateGroupInfo);
+            MyFileUtils.writeLinesToFileFromHead(templateGroupInfoLines, templateGroupInfoFilePath, "utf-8");
+
+            sqlTemplateGroup.setTemplateIdStr(templateIds);
+            String templateIdsFilePath = sqlTemplateGroup.getTemplateIdsFilePath();
+            List<String> templateIdsLines = MyFileUtils.convertStringToLines(templateIds);
+            MyFileUtils.writeLinesToFileFromHead(templateIdsLines, templateIdsFilePath, "utf-8");
+
+            runtimeCacheService.getSqlTemplateGroupMap().put(templateGroupId, sqlTemplateGroup);
+        }
+        return apiResponse;
+    }
+
+    public ApiResponse deleteSqlTemplateGroup(String templateGroupId) throws Exception {
+        ApiResponse apiResponse = new ApiResponse();
+        SqlTemplateGroup sqlTemplateGroup = runtimeCacheService.getSqlTemplateGroup(templateGroupId);
+        if (sqlTemplateGroup == null) {
+            return apiResponse;
+        }
+        synchronized (LockFactory.getLock("sqltemplategroup")) {
+            if (runtimeCacheService.getSqlTemplateGroup(templateGroupId) == null) {
+                return apiResponse;
+            }
+            runtimeCacheService.getSqlTemplateGroupMap().remove(templateGroupId);
+            String dirPath = configuration.getSqlTemplateGroupBasePath() + templateGroupId;
+            File dir = new File(dirPath);
+            MyFileUtils.deleteDirOrFile(dir);
+        }
+        return apiResponse;
+    }
+
+    public ApiResponse deleteSqlTemplateGroups(JSONArray array) throws Exception {
+        ApiResponse apiResponse = new ApiResponse();
+        synchronized (LockFactory.getLock("sqltemplategroup")) {
+            for(int i=0; i<array.size(); i++) {
+                String templateGroupId = array.getString(i);
+                SqlTemplateGroup sqlTemplateGroup = runtimeCacheService.getSqlTemplateGroup(templateGroupId);
+                if (sqlTemplateGroup == null) {
+                    continue;
+                }
+                runtimeCacheService.getSqlTemplateGroupMap().remove(templateGroupId);
+                String dirPath = configuration.getSqlTemplateGroupBasePath() + templateGroupId;
+                File dir = new File(dirPath);
+                MyFileUtils.deleteDirOrFile(dir);
+            }
+        }
         return apiResponse;
     }
 }
