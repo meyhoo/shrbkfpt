@@ -1,10 +1,155 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <title>自动生成SQL</title>
+    <link rel="stylesheet" th:href="@{/frame/zTree/css/zTreeStyle/zTreeStyle.css}"/>
+    <link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap-3.3.5.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap-datetimepicker.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/font-awesome/css/font-awesome.css}" />
+    <link rel="stylesheet" th:href="@{/frame/dataTables/theme/dataTables.bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/index2.css}" />
+    <style type="text/css">
+        .contentwrap {
+            width: 98%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        ul {
+            list-style: none;
+            margin: 0;
+            padding-left: 20px;
+        }
+        ul.tab {
+            border-bottom: 1px solid #ccc;
+            padding-bottom:1px;
+            height: 30px;
+            line-height: 30px;
+            color: #696969;
+        }
+        ul.tab li {
+            float: left;
+            font-family: "微软雅黑";
+            cursor: pointer;
+            padding: 0px;
 
+
+        }
+        ul.tab li.li {
+            padding: 0px 25px 0px;
+            font-size: 13px;
+            height: 30px;
+            line-height: 30px;
+            background:#F4F5F9;
+            border-top: 1px solid #C5D0DC;
+            border-left: 1px solid #C5D0DC;
+            border-bottom: 1px solid #C5D0DC;
+
+        }
+        ul.tab li.current {
+            border-bottom: 0px;
+            border-top: 2px solid #7599DE;
+            font-size: 13px;
+            color: #343434;
+            background:#FFFFFF;
+
+        }
+        ul.tab li.li:last-child{border-right: 1px solid #C5D0DC;}
+
+    </style>
+</head>
+<body ms-controller="bodyController">
+
+<div id="content" class="mycontainer">
+
+    <!-- 标题 -->
+    <div class="mycontainer-title">
+        <span class="mycontainer-title-icon"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></span>
+        <span class="mycontainer-title-text">自动生成SQL</span>
+        <span class="mycontainer-title-return"><input class="btn btn-default btn-sm" type="button" value="返回" ms-click="returnBack" /></span>
+    </div>
+
+    <form id="basic_validate">
+        <table class="form-table">
+            <tr>
+                <td width="200" align="center"><span><font class="red">*</font>模板组名称:</span></td>
+                <td><span><input readonly type="text" class="form-input" name="templateGroupId" ms-duplex="saveParams.templateGroupId" maxlength="500" style="width:500px"/></span></td>
+                <textarea id="runSqlTemplate" hidden class="form-textarea" name="runSqlContent" th:text="${runSqlContent}" style="width:700px"></textarea>
+                <textarea id="rollbackSqlTemplate" hidden class="form-textarea" name="rollbackSqlContent" th:text="${rollbackSqlContent}" style="width:700px"></textarea>
+            </tr>
+            <tr th:each="paramName:${placeholders}">
+                <td width="200" align="center" th:text="${paramName}"></td>
+                <td><span><input type="text" class="form-input myinput" th:name="${paramName}" th:id="${paramName}" maxlength="500" style="width:500px"/></span></td>
+            </tr>
+
+        </table>
+    </form>
+
+    <hr class="myhr"/>
+
+    <div>
+        <input class="btn btn-primary btn-sm" type="button" value="生成" ms-click="createAction"/>
+    </div>
+
+    <div id="contentwrap"  class="contentwrap">
+        <ul class="tab" id="tab">
+            <li id="tab-title1" class="li current"><span>执行脚本</span></li>
+            <li id="tab-title2" class="li"><span>回滚脚本</span></li>
+        </ul>
+        <div id="tab-content">
+            <div class="tab-content-item" id="tab-content-item1">
+                <tr>
+                    <td><span><textarea id="runSqlContent" readonly class="form-textarea" name="runSqlContent" ms-duplex="saveParams.runSqlContent" style="width:100%"></textarea></span></td>
+                </tr>
+            </div>
+            <div class="tab-content-item" id="tab-content-item2">
+                <tr>
+                    <td><span><textarea id="rollbackSqlContent" readonly class="form-textarea" name="runSqlContent" ms-duplex="saveParams.runSqlContent" style="width:100%"></textarea></span></td>
+                </tr>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/frame/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-3.3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-datetimepicker.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-datetimepicker.zh-CN.js}"></script>
+<script type="text/javascript" th:src="@{/frame/dataTables/jquery.dataTables-1.10.8.min.js}"></script>
+<script type="text/javascript" th:src="@{/frame/dataTables/dataTables.bootstrap-1.10.8.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.validate.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.validate.common.js}"></script>
+<script type="text/javascript" th:src="@{/js/xycims.js}"></script>
+<script type="text/javascript" th:src="@{/js/avalon.js}"></script>
+<script type="text/javascript" th:src="@{/frame/zTree/js/jquery.ztree.core-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/frame/zTree/js/jquery.ztree.excheck-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/developer/sqlAutoCreatePage.js}"></script>
+<script>
+    $('#tab-content-item2').hide();
+    $(function(){
+        $('#tab > li').on("click",function(){
+            var num=$(this).index();
+            var domId = $(this).attr('id');
+            if('tab-title1' == domId){
+                $('#tab-content-item1').show();
+                $('#tab-content-item2').hide();
+            }
+            if('tab-title2' == domId){
+                $('#tab-content-item2').show();
+                $('#tab-content-item1').hide();
+            }
+            $('#tab > li').each(function(){
+                if($(this).index()==num){
+                    $(this).attr("class","li current");
+                }else{
+                    $(this).attr("class","li");
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

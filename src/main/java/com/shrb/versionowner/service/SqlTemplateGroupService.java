@@ -6,7 +6,6 @@ import com.shrb.versionowner.entity.api.ApiExtendResponse;
 import com.shrb.versionowner.entity.api.ApiResponse;
 import com.shrb.versionowner.entity.business.SqlTemplateGroup;
 import com.shrb.versionowner.entity.configuration.Configuration;
-import com.shrb.versionowner.entity.file.MyFile;
 import com.shrb.versionowner.lock.LockFactory;
 import com.shrb.versionowner.utils.CollectionUtils;
 import com.shrb.versionowner.utils.MyFileUtils;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +103,7 @@ public class SqlTemplateGroupService {
         sqlTemplateGroup.setTemplateGroupId(templateGroupId);
         sqlTemplateGroup.setTemplateGroupInfo(templateGroupInfo);
         sqlTemplateGroup.setTemplateIdStr(templateIds);
-        String basePath = configuration.getSqlTemplatesBasePath();
+        String basePath = configuration.getSqlTemplateGroupBasePath();
         String templateGroupInfoFilePath = basePath+templateGroupId + "/" + TEMPLATE_GROUP_INFO_FILE_NAME;
         String templateIdsFilePath = basePath+templateGroupId + "/" + TEMPLATE_IDS_FILE_NAME;
         sqlTemplateGroup.setTemplateGroupInfoFilePath(templateGroupInfoFilePath);

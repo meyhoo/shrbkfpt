@@ -38,7 +38,7 @@ window.tableObj = $('#tableList').DataTable({
         { title:'中文说明', name: 'templateInfo', data: 'templateInfo' },
         { title:'操作', name: 'opration', data: null,"render": function ( data, type, row ) {
                 return 	"<a class='able-a' ms-click=\"changeDialog('edit', "+row.id+")\">修改</a>"+
-                    "<a class='able-a' ms-click=\"openDelete(\'"+row.userName+"\')\">删除</a>";
+                    "<a class='able-a' ms-click=\"openDelete(\'"+row.templateId+"\')\">删除</a>";
             }}
     ],
     "drawCallback": function(settings){
