@@ -1,5 +1,7 @@
 package com.shrb.versionowner.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.shrb.versionowner.entity.api.ApiResponse;
 import com.shrb.versionowner.entity.business.SqlTemplate;
 import com.shrb.versionowner.entity.business.SqlTemplateGroup;
 import com.shrb.versionowner.utils.MyFileUtils;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class SqlAutoCreateService {
@@ -56,5 +59,23 @@ public class SqlAutoCreateService {
         resultMap.put("runSqlContent", MyFileUtils.convertLinesToString(runSqlLineList));
         resultMap.put("rollbackSqlContent", MyFileUtils.convertLinesToString(rollbackSqlLineList));
         return resultMap;
+    }
+
+    public ApiResponse createSql(JSONObject jsonObject) throws Exception {
+        ApiResponse apiResponse = new ApiResponse();
+        String runSqlTemplateContent = jsonObject.getString("runSqlContent");
+        String rollbackSqlTemplateContent = jsonObject.getString("rollbackSqlContent");
+        jsonObject.remove("runSqlContent");
+        jsonObject.remove("rollbackSqlContent");
+        for(Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+            String regex = "#\\{"+entry.getKey()+"}";
+            runSqlTemplateContent = runSqlTemplateContent.replaceAll(regex, entry.getValue().toString());
+            rollbackSqlTemplateContent = rollbackSqlTemplateContent.replaceAll(regex, entry.getValue().toString());
+        }
+        JSONObject data = new JSONObject();
+        data.put("runSqlContent", runSqlTemplateContent);
+        data.put("rollbackSqlContent", rollbackSqlTemplateContent);
+        apiResponse.setData(data);
+        return apiResponse;
     }
 }

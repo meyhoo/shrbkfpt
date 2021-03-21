@@ -11,6 +11,7 @@
     <link rel="stylesheet" th:href="@{/frame/dataTables/theme/dataTables.bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/css/index2.css}" />
     <style type="text/css">
+        input:-webkit-autofill {-webkit-box-shadow: 0 0 0px 1000px white inset;}
         .contentwrap {
             width: 98%;
             margin: 0 auto;
@@ -80,7 +81,7 @@
             </tr>
             <tr th:each="paramName:${placeholders}">
                 <td width="200" align="center" th:text="${paramName}"></td>
-                <td><span><input type="text" class="form-input myinput" th:name="${paramName}" th:id="${paramName}" maxlength="500" style="width:500px"/></span></td>
+                <td><span><input autocomplete="off" type="text" class="form-input myinput" th:name="${paramName}" th:id="${paramName}" maxlength="500" style="width:500px"/></span></td>
             </tr>
 
         </table>
@@ -90,6 +91,7 @@
 
     <div>
         <input class="btn btn-primary btn-sm" type="button" value="生成" ms-click="createAction"/>
+        <input class="btn btn-primary btn-sm" type="button" value="清空" ms-click="clearAction"/>
     </div>
 
     <div id="contentwrap"  class="contentwrap">
