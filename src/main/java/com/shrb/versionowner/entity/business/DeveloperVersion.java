@@ -6,6 +6,7 @@ public class DeveloperVersion {
     private String versionId;
     private String userId;
     private List<Task> taskList;
+    private String taskInfoFilePath;
 
     public String getVersionId() {
         return versionId;
@@ -29,5 +30,13 @@ public class DeveloperVersion {
 
     public void setTaskList(List<Task> taskList) {
         this.taskList = taskList;
+    }
+
+    public String getTaskInfoFilePath() {
+        return taskInfoFilePath;
+    }
+
+    public void setTaskInfoFilePath(String taskInfoFilePath) {
+        this.taskInfoFilePath = taskInfoFilePath;
     }
 }

@@ -30,6 +30,9 @@ public class RuntimeCacheService {
     private AdministratorVersionService administratorVersionService;
 
     @Autowired
+    private DeveloperVersionService developerVersionService;
+
+    @Autowired
     private BeforeRunAction beforeRunAction;
 
     private volatile ConcurrentHashMap<String, User> userMap;
@@ -38,6 +41,7 @@ public class RuntimeCacheService {
     private volatile ConcurrentHashMap<String, SystemUrl> systemUrlMap;
     private volatile ConcurrentHashMap<String, AdministratorVersion> administratorVersionMap;
     private volatile ConcurrentHashMap<String, ArrayList<String>> versionCommitterMap;
+    //<userId, <versionId, developerVersion>>
     private volatile ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> developerVersionMap;
 
     @PostConstruct
@@ -53,7 +57,8 @@ public class RuntimeCacheService {
         beforeRunAction.prepareAdministratorVersionDir();
         this.administratorVersionMap = initAdministratorVersionMap();
         this.versionCommitterMap = initVersionCommitterMap();
-
+        beforeRunAction.prepareDeveloperVersionDir();
+        this.developerVersionMap = initDeveloperVersionMap();
     }
 
     private ConcurrentHashMap<String, User> initUserMap() {
@@ -116,6 +121,16 @@ public class RuntimeCacheService {
         }
     }
 
+    private ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> initDeveloperVersionMap() {
+        try {
+            ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> map = developerVersionService.getDeveloperVersionMap();
+            return map;
+        } catch (Exception e) {
+            log.error("initDeveloperVersionMap failed. ", e);
+            return null;
+        }
+    }
+
     public User getUser(String userName) {
         return this.userMap.get(userName);
     }
@@ -130,6 +145,18 @@ public class RuntimeCacheService {
 
     public SystemUrl getSystemUrl(String systemUrlId) {
         return this.systemUrlMap.get(systemUrlId);
+    }
+
+    public AdministratorVersion getAdministratorVersion(String versionId) {
+        return this.administratorVersionMap.get(versionId);
+    }
+
+    public List<String> getVersionCommitters(String versionId) {
+        return this.versionCommitterMap.get(versionId);
+    }
+
+    public DeveloperVersion getDeveloperVersion(String userId, String versionId) {
+        return this.developerVersionMap.get(userId).get(versionId);
     }
 
     public List<Map<String, Object>> getUserList() {
@@ -204,6 +231,66 @@ public class RuntimeCacheService {
         return sqlTemplateGroupList;
     }
 
+    public List<Map<String, Object>> getAdministratorVersionList() {
+        List<Map<String, Object>> administratorVersionList = new ArrayList<>();
+        administratorVersionMap.forEach((key, value) -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("versionId", value.getVersionId());
+            map.put("versionInfo", value.getVersionInfo());
+            //管理者需要知道指定版本有哪些提交者
+            List<String> committerUserIds = getVersionCommitters(value.getVersionId());
+            map.put("committerNames", committerUserIds);
+            //管理者需要知道指定版本的任务情况
+            List<Map<String, Object>> taskList = new ArrayList<>();
+            for (String userId : committerUserIds) {
+                DeveloperVersion developerVersion = getDeveloperVersion(userId, value.getVersionId());
+                List<Task> committerTaskList = developerVersion.getTaskList();
+                List<Map<String, Object>> committerTaskInfoList = new ArrayList<>();
+                for (Task task : committerTaskList) {
+                    HashMap<String, Object> taskMap = new HashMap<>();
+                    taskMap.put("taskInfo", task.getTaskInfo());
+                    taskMap.put("userName", task.getUserId());
+                    taskMap.put("state", task.getState());
+                    committerTaskInfoList.add(taskMap);
+                }
+                taskList.addAll(committerTaskInfoList);
+            }
+            map.put("taskList", taskList);
+            administratorVersionList.add(map);
+        });
+        return administratorVersionList;
+    }
+
+    public List<Map<String, Object>> getDeveloperVersionList(String userName) {
+        List<Map<String, Object>> developerVersionList = new ArrayList<>();
+        administratorVersionMap.forEach((key, value) -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("versionId", value.getVersionId());
+            map.put("versionInfo", value.getVersionInfo());
+            //开发者需要知道自己是否是提交者 0-不是 1-是
+            List<String> committerUserIds = getVersionCommitters(value.getVersionId());
+            if (committerUserIds.contains(userName)) {
+                map.put("committerFlag", "1");
+                //开发者需要知道自己的任务情况
+                DeveloperVersion developerVersion = getDeveloperVersion(userName, value.getVersionId());
+                List<Task> taskList = developerVersion.getTaskList();
+                List<Map<String, Object>> taskInfoList = new ArrayList<>();
+                for (Task task : taskList) {
+                    HashMap<String, Object> taskMap = new HashMap<>();
+                    taskMap.put("taskInfo", task.getTaskInfo());
+                    taskMap.put("state", task.getState());
+                    taskInfoList.add(taskMap);
+                }
+                map.put("taskList", taskInfoList);
+            } else {
+                map.put("committerFlag", "0");
+                map.put("taskList", new ArrayList<>());
+            }
+            developerVersionList.add(map);
+        });
+        return developerVersionList;
+    }
+
     public ConcurrentHashMap<String, User> getUserMap() {
         return userMap;
     }
@@ -234,5 +321,29 @@ public class RuntimeCacheService {
 
     public void setSystemUrlMap(ConcurrentHashMap<String, SystemUrl> systemUrlMap) {
         this.systemUrlMap = systemUrlMap;
+    }
+
+    public ConcurrentHashMap<String, AdministratorVersion> getAdministratorVersionMap() {
+        return administratorVersionMap;
+    }
+
+    public void setAdministratorVersionMap(ConcurrentHashMap<String, AdministratorVersion> administratorVersionMap) {
+        this.administratorVersionMap = administratorVersionMap;
+    }
+
+    public ConcurrentHashMap<String, ArrayList<String>> getVersionCommitterMap() {
+        return versionCommitterMap;
+    }
+
+    public void setVersionCommitterMap(ConcurrentHashMap<String, ArrayList<String>> versionCommitterMap) {
+        this.versionCommitterMap = versionCommitterMap;
+    }
+
+    public ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> getDeveloperVersionMap() {
+        return developerVersionMap;
+    }
+
+    public void setDeveloperVersionMap(ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> developerVersionMap) {
+        this.developerVersionMap = developerVersionMap;
     }
 }
