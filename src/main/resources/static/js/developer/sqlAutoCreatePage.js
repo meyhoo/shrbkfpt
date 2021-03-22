@@ -27,8 +27,16 @@ var vmcontent = avalon.define({
                 if (res.errorCode == '000000') {
                     var runSqlContent = res.data.runSqlContent;
                     var rollbackSqlContent = res.data.rollbackSqlContent;
-                    $("#runSqlContent").val($("#runSqlContent").val()+'\n'+runSqlContent);
-                    $("#rollbackSqlContent").val($("#rollbackSqlContent").val()+'\n'+rollbackSqlContent);
+                    if($("#runSqlContent").val()==''){
+                        $("#runSqlContent").val(runSqlContent);
+                    }else{
+                        $("#runSqlContent").val($("#runSqlContent").val()+'\n\n'+runSqlContent);
+                    }
+                    if($("#rollbackSqlContent").val()==''){
+                        $("#rollbackSqlContent").val(rollbackSqlContent);
+                    }else{
+                        $("#rollbackSqlContent").val($("#rollbackSqlContent").val()+'\n\n'+rollbackSqlContent);
+                    }
                     $('.form-input.myinput').each(function(){
                         $(this).val('');
                     });

@@ -1,8 +1,6 @@
 package com.shrb.versionowner.service;
 
-import com.shrb.versionowner.entity.business.SqlTemplate;
-import com.shrb.versionowner.entity.business.SqlTemplateGroup;
-import com.shrb.versionowner.entity.business.User;
+import com.shrb.versionowner.entity.business.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +18,16 @@ public class RuntimeCacheService {
     private UserService userService;
 
     @Autowired
+    private SystemUrlService systemUrlService;
+
+    @Autowired
     private SqlTemplateService sqlTemplateService;
 
     @Autowired
     private SqlTemplateGroupService sqlTemplateGroupService;
+
+    @Autowired
+    private AdministratorVersionService administratorVersionService;
 
     @Autowired
     private BeforeRunAction beforeRunAction;
@@ -31,6 +35,10 @@ public class RuntimeCacheService {
     private volatile ConcurrentHashMap<String, User> userMap;
     private volatile ConcurrentHashMap<String, SqlTemplate> sqlTemplateMap;
     private volatile ConcurrentHashMap<String, SqlTemplateGroup> sqlTemplateGroupMap;
+    private volatile ConcurrentHashMap<String, SystemUrl> systemUrlMap;
+    private volatile ConcurrentHashMap<String, AdministratorVersion> administratorVersionMap;
+    private volatile ConcurrentHashMap<String, ArrayList<String>> versionCommitterMap;
+    private volatile ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> developerVersionMap;
 
     @PostConstruct
     private void init() throws Exception {
@@ -40,6 +48,12 @@ public class RuntimeCacheService {
         this.sqlTemplateMap = initSqlTemplateMap();
         beforeRunAction.prepareSqlTemplateGroupDir();
         this.sqlTemplateGroupMap = initSqlTemplateGroupMap();
+        beforeRunAction.prepareSystemUrlInfoFile();
+        this.systemUrlMap = initSystemUrlMap();
+        beforeRunAction.prepareAdministratorVersionDir();
+        this.administratorVersionMap = initAdministratorVersionMap();
+        this.versionCommitterMap = initVersionCommitterMap();
+
     }
 
     private ConcurrentHashMap<String, User> initUserMap() {
@@ -48,6 +62,16 @@ public class RuntimeCacheService {
             return map;
         } catch (Exception e) {
             log.error("initUserMap failed. ", e);
+            return null;
+        }
+    }
+
+    private ConcurrentHashMap<String, SystemUrl> initSystemUrlMap() {
+        try{
+            ConcurrentHashMap<String, SystemUrl> map = systemUrlService.getSystemUrlMap();
+            return map;
+        } catch (Exception e) {
+            log.error("initSystemUrlMap failed. ", e);
             return null;
         }
     }
@@ -72,6 +96,26 @@ public class RuntimeCacheService {
         }
     }
 
+    private ConcurrentHashMap<String, AdministratorVersion> initAdministratorVersionMap() {
+        try {
+            ConcurrentHashMap<String, AdministratorVersion> map = administratorVersionService.getAdministratorVersionMap();
+            return map;
+        } catch (Exception e) {
+            log.error("initAdministratorVersionMap failed. ", e);
+            return null;
+        }
+    }
+
+    private ConcurrentHashMap<String, ArrayList<String>> initVersionCommitterMap() {
+        try {
+            ConcurrentHashMap<String, ArrayList<String>> map = administratorVersionService.getVersionCommitterMap();
+            return map;
+        } catch (Exception e) {
+            log.error("initVersionCommitterMap failed. ", e);
+            return null;
+        }
+    }
+
     public User getUser(String userName) {
         return this.userMap.get(userName);
     }
@@ -82,6 +126,10 @@ public class RuntimeCacheService {
 
     public SqlTemplateGroup getSqlTemplateGroup(String templateGroupId) {
         return this.sqlTemplateGroupMap.get(templateGroupId);
+    }
+
+    public SystemUrl getSystemUrl(String systemUrlId) {
+        return this.systemUrlMap.get(systemUrlId);
     }
 
     public List<Map<String, Object>> getUserList() {
@@ -100,6 +148,21 @@ public class RuntimeCacheService {
             }
         });
         return userList;
+    }
+
+    public List<SystemUrl> getSystemUrlList() {
+        List<SystemUrl> systemUrlList = new ArrayList<>();
+        systemUrlMap.forEach((key, value) -> {
+            systemUrlList.add(value);
+        });
+        Collections.sort(systemUrlList, new Comparator<SystemUrl>() {
+            @Override
+            public int compare(SystemUrl o1, SystemUrl o2) {
+                int i = o1.getSystemUrlId().compareTo(o2.getSystemUrlId());
+                return i>0?1:-1;
+            }
+        });
+        return systemUrlList;
     }
 
     public List<Map<String, Object>> getSqlTemplateList() {
@@ -163,5 +226,13 @@ public class RuntimeCacheService {
 
     public void setSqlTemplateGroupMap(ConcurrentHashMap<String, SqlTemplateGroup> sqlTemplateGroupMap) {
         this.sqlTemplateGroupMap = sqlTemplateGroupMap;
+    }
+
+    public ConcurrentHashMap<String, SystemUrl> getSystemUrlMap() {
+        return systemUrlMap;
+    }
+
+    public void setSystemUrlMap(ConcurrentHashMap<String, SystemUrl> systemUrlMap) {
+        this.systemUrlMap = systemUrlMap;
     }
 }

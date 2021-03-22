@@ -8,6 +8,9 @@ public class Configuration {
     @Value("${configuration.filepath.userinfo}")
     private String userInfoFilePath;
 
+    @Value("${configuration.filepath.systemUrlInfo}")
+    private String systemUrlInfoFilePath;
+
     @Value("${shiro.session.timeout}")
     private Long shiroSessionTimeout;
 
@@ -16,6 +19,12 @@ public class Configuration {
 
     @Value("${configuration.filepath.sqlTemplateGroup.basePath}")
     private String sqlTemplateGroupBasePath;
+
+    @Value("${configuration.filepath.developer.version.basePath}")
+    private String developerVersionBasePath;
+
+    @Value("${configuration.filepath.administrator.version.basePath}")
+    private String administratorVersionBasePath;
 
     public String getUserInfoFilePath() {
         return userInfoFilePath;
@@ -31,5 +40,17 @@ public class Configuration {
 
     public String getSqlTemplateGroupBasePath() {
         return sqlTemplateGroupBasePath;
+    }
+
+    public String getSystemUrlInfoFilePath() {
+        return systemUrlInfoFilePath;
+    }
+
+    public String getDeveloperVersionBasePath() {
+        return developerVersionBasePath;
+    }
+
+    public String getAdministratorVersionBasePath() {
+        return administratorVersionBasePath;
     }
 }

@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>添加环境清单</title>
+    <title>修改环境清单</title>
     <link rel="stylesheet" th:href="@{/frame/zTree/css/zTreeStyle/zTreeStyle.css}"/>
     <link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap-3.3.5.min.css}" />
     <link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap-datetimepicker.min.css}" />
@@ -18,7 +18,7 @@
     <!-- 标题 -->
     <div class="mycontainer-title">
         <span class="mycontainer-title-icon"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></span>
-        <span class="mycontainer-title-text">添加环境清单</span>
+        <span class="mycontainer-title-text">修改环境清单</span>
         <span class="mycontainer-title-return"><input class="btn btn-default btn-sm" type="button" value="返回" ms-click="returnBack" /></span>
     </div>
 
@@ -26,7 +26,7 @@
         <table class="form-table">
             <tr>
                 <td width="200" align="center"><span><font class="red">*</font>环境清单名:</span></td>
-                <td><span><input type="text" class="form-input" name="systemUrlId" ms-duplex="saveParams.systemUrlId" maxlength="50" style="width:250px"/></span></td>
+                <td><span><input readonly type="text" class="form-input" name="systemUrlId" ms-duplex="saveParams.systemUrlId" maxlength="50" style="width:250px"/></span></td>
             </tr>
             <tr>
                 <td align="center"><span>&nbsp;中文说明:</span></td>
@@ -76,6 +76,6 @@
 <script type="text/javascript" th:src="@{/js/avalon.js}"></script>
 <script type="text/javascript" th:src="@{/frame/zTree/js/jquery.ztree.core-3.5.min.js}"></script>
 <script type="text/javascript" th:src="@{/frame/zTree/js/jquery.ztree.excheck-3.5.min.js}"></script>
-<script type="text/javascript" th:src="@{/js/public/addSystemUrlPage.js}"></script>
+<script type="text/javascript" th:src="@{/js/public/editSystemUrlPage.js}"></script>
 </body>
 </html>

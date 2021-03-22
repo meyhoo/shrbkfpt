@@ -2,8 +2,6 @@ package com.shrb.versionowner.service;
 
 import com.shrb.versionowner.entity.configuration.Configuration;
 import com.shrb.versionowner.utils.MyFileUtils;
-import org.apache.shiro.crypto.hash.Md5Hash;
-import org.apache.tomcat.util.security.MD5Encoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +32,13 @@ public class BeforeRunAction {
         }
     }
 
+    public void prepareSystemUrlInfoFile() throws Exception {
+        String path = configuration.getSystemUrlInfoFilePath();
+        if (!MyFileUtils.judgeFileExists(path)) {
+            MyFileUtils.createFile(path);
+        }
+    }
+
     public void prepareSqlTemplateDir() throws Exception {
         String basePath = configuration.getSqlTemplatesBasePath();
         MyFileUtils.createFile(basePath);
@@ -41,6 +46,16 @@ public class BeforeRunAction {
 
     public void prepareSqlTemplateGroupDir() throws Exception {
         String basePath = configuration.getSqlTemplateGroupBasePath();
+        MyFileUtils.createFile(basePath);
+    }
+
+    public void prepareDeveloperVersionDir() throws Exception {
+        String basePath = configuration.getDeveloperVersionBasePath();
+        MyFileUtils.createFile(basePath);
+    }
+
+    public void prepareAdministratorVersionDir() throws Exception {
+        String basePath = configuration.getAdministratorVersionBasePath();
         MyFileUtils.createFile(basePath);
     }
 

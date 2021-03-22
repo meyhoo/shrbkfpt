@@ -15,6 +15,7 @@ public class PublicRouteController {
     private final static String EDIT_SQL_TEMPLATE_GROUP_HTML = "/public/editSqlTemplateGroupPage";
     private final static String SYSTEM_URLS_HTML = "/public/systemUrlsPage";
     private final static String ADD_SYSTEM_URL_HTML = "/public/addSystemUrlPage";
+    private final static String EDIT_SYSTEM_URL_HTML = "/public/editSystemUrlPage";
 
     @RequestMapping("/sqlTemplatesPage.html")
     public String sqlTemplatesPage() {
@@ -54,5 +55,10 @@ public class PublicRouteController {
     @RequestMapping("/addSystemUrlPage.html")
     public String addSystemUrlPage() {
         return ADD_SYSTEM_URL_HTML;
+    }
+
+    @RequestMapping("/editSystemUrlPage.html")
+    public String editSystemUrlPage() {
+        return EDIT_SYSTEM_URL_HTML;
     }
 }
