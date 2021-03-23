@@ -122,7 +122,7 @@ public class DeveloperVersionService {
         return apiExtendResponse;
     }
 
-    public ApiResponse addVersionCommitter(String versionId, String userName) throws Exception {
+    public ApiResponse becomeCommitter(String versionId, String userName) throws Exception {
         ApiResponse apiResponse = new ApiResponse();
         if (runtimeCacheService.getVersionCommitters(versionId).contains(userName)) {
             apiResponse.setErrorCode("999999");
@@ -141,14 +141,15 @@ public class DeveloperVersionService {
             rewriteVersionCommitterToFile(versionId);
         }
         synchronized (LockFactory.getLock("developerVersion_"+userName+"_"+versionId)) {
+            HashMap<String, DeveloperVersion> map = runtimeCacheService.getDeveloperVersionMap().get(userName);
+            if (map.get(versionId) != null) {
+                return apiResponse;
+            }
             String basePath = configuration.getDeveloperVersionBasePath() + userName + "/" + versionId;
             MyFileUtils.createFile(basePath);
             String priorityInfoFilePath = basePath + "/" + PRIORITY_INFO_FILE_NAME;
             String taskInfoFilePath = basePath + "/" + TASK_INFO_FILE_NAME;
             String versionContentDirPath = basePath + VERSION_CONTENT_DIR_NAME;
-            MyFileUtils.createFile(priorityInfoFilePath);
-            MyFileUtils.createFile(taskInfoFilePath);
-            MyFileUtils.createFile(versionContentDirPath);
             DeveloperVersion developerVersion = new DeveloperVersion();
             developerVersion.setVersionId(versionId);
             Integer priority = Integer.MAX_VALUE;
@@ -158,9 +159,14 @@ public class DeveloperVersionService {
             developerVersion.setPriorityInfoFilePath(priorityInfoFilePath);
             developerVersion.setTaskInfoFilePath(taskInfoFilePath);
             developerVersion.setVersionContentDirPath(versionContentDirPath);
+            MyFileUtils.createFile(priorityInfoFilePath);
+            MyFileUtils.createFile(taskInfoFilePath);
+            MyFileUtils.createFile(versionContentDirPath);
             List<String> lines = new ArrayList<>();
             lines.add(priority.toString());
             MyFileUtils.writeLinesToFileFromHead(lines, priorityInfoFilePath, "utf-8");
+            map.put(versionId, developerVersion);
+            runtimeCacheService.getDeveloperVersionMap().put(userName, map);
         }
         return apiResponse;
     }

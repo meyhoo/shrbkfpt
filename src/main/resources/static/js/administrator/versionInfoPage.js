@@ -12,7 +12,7 @@ var tableObj = $('#tableList').DataTable({
         sUrl: window.baseUrl + "/frame/dataTables/Chinese.json"
     },
     "ajax":{						//ajax请求地址
-        "url" : window.baseUrl + '/administrator/searchAdministratorVersionList',
+        "url" : window.baseUrl + '/administrator/searchCommitterTaskList',
         "type" : "post",
         "data": function ( req ) {
             var reqObj = {
@@ -41,11 +41,16 @@ var tableObj = $('#tableList').DataTable({
         { title:'序号', name: '', data: null ,"render": function(data, type, row){
                 return "";
             }},
-        { title:'版本名称', name: 'versionId', data: 'versionId' },
-        { title:'中文说明', name: 'versionInfo', data: 'versionInfo' },
-        { title:'操作', name: 'opration', data: null,"render": function ( data, type, row ) {
-                return 	"<a class='able-a' ms-click=\"changeDialog('edit', "+row.id+")\">查看</a>"+
-                    "<a class='able-a' ms-click=\"openDelete(\'"+row.versionId+"\')\">删除</a>";
+        { title:'需求', name: 'taskInfo', data: 'taskInfo' },
+        { title:'负责人', name: 'userName', data: 'userName' },
+        { title:'状态', name: 'state', data: 'state', "render": function ( data, type, row ) {
+                var stateName = "";
+                if(data == "0") {
+                    stateName = "未完成";
+                }else if(data == "1"){
+                    stateName = "已完成";
+                }
+                return stateName;
             }}
     ],
     "drawCallback": function(settings){

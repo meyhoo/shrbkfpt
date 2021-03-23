@@ -28,6 +28,14 @@ public class AdministratorVersionController {
     }
 
     @ApiRsp
+    @RequestMapping(value = "/searchCommitterTaskList", method = RequestMethod.POST)
+    @ResponseBody
+    public ApiResponse searchCommitterTaskList(HttpServletRequest request) throws Exception {
+        ApiExtendResponse apiResponse = administratorVersionService.searchCommitterTaskList(request);
+        return apiResponse;
+    }
+
+    @ApiRsp
     @RequestMapping(value = "/addAdministratorVersion", method = RequestMethod.POST)
     @ResponseBody
     public ApiResponse addAdministratorVersion(String versionId, String versionInfo) throws Exception {

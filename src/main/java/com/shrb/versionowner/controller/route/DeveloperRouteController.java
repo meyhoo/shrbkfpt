@@ -14,12 +14,23 @@ import java.util.Map;
 @RequestMapping("/developer")
 public class DeveloperRouteController {
     private static final Logger log = LoggerFactory.getLogger(DeveloperRouteController.class);
+    private final static String CHOOSE_VERSION_HTML = "/developer/chooseVersionPage";
     private final static String COMMIT_VERSION_HTML = "/developer/commitVersionPage";
     private final static String SELECT_TEMPLATE_GROUP_HTML = "/developer/selectTemplateGroupPage";
     private final static String SQL_AUTO_CREATE_HTML = "/developer/sqlAutoCreatePage";
 
     @Autowired
     private SqlAutoCreateService sqlAutoCreateService;
+
+    @RequestMapping("/chooseVersionPage.html")
+    public String chooseVersionPage() {
+        return CHOOSE_VERSION_HTML;
+    }
+
+    @RequestMapping("/commitVersionPage.html")
+    public String commitVersionPage() {
+        return COMMIT_VERSION_HTML;
+    }
 
     @RequestMapping("/selectTemplateGroupPage.html")
     public String selectTemplateGroupPage() {

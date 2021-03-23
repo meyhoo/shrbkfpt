@@ -104,6 +104,28 @@ public class AdministratorVersionService {
         return apiExtendResponse;
     }
 
+    public ApiExtendResponse searchCommitterTaskList(HttpServletRequest request) throws Exception {
+        JSONObject requestJson = WebHttpUtils.getHttpRequestJson(request);
+        Integer draw = Integer.parseInt(requestJson.getString("draw"));
+        Integer from = Integer.parseInt(requestJson.getString("start"));
+        Integer pageSize = Integer.parseInt(requestJson.getString("pageCount"));
+        String versionId = requestJson.getString("versionId");
+        Map<String, Object> map = new HashMap<>();
+        map.put("versionId", versionId);
+        map.put("pageSize", pageSize);
+        map.put("from", from);
+        List<Map<String, Object>> list = runtimeCacheService.getCommitterTaskList(versionId);
+        CollectionUtils<Map<String, Object>> collectionUtils = new CollectionUtils<Map<String, Object>>(list, map);
+        CollectionUtils.ResultInfo<Map<String, Object>> resultInfo = collectionUtils.getListByFuzzyMatch();
+        ApiExtendResponse apiExtendResponse = new ApiExtendResponse();
+        apiExtendResponse.setData(resultInfo.getList());
+        apiExtendResponse.setDraw(draw);
+        apiExtendResponse.setPageCount(pageSize);
+        apiExtendResponse.setDataMaxCount(resultInfo.getCount());
+        apiExtendResponse.setDataMaxPage(resultInfo.getCount() % pageSize == 0 ? resultInfo.getCount() / pageSize : resultInfo.getCount() / pageSize + 1);
+        return apiExtendResponse;
+    }
+
     public ApiResponse addAdministratorVersion(String versionId, String versionInfo) throws Exception {
         ApiResponse apiResponse = new ApiResponse();
         AdministratorVersion administratorVersion = runtimeCacheService.getAdministratorVersion(versionId);

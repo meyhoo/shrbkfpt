@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,16 +32,38 @@ public class UserService {
 
     /**
      * 把缓存中的用户数据批量写入到文件中
+     * 同时检查developer目录，多余的删除，缺少的创建
      * @throws Exception
      */
     public void rewriteUserInfoToFile() throws Exception {
         String userInfoFilePath = configuration.getUserInfoFilePath();
         List<String> lines = new ArrayList<>();
+        List<String> userNameList = new ArrayList<>();
         runtimeCacheService.getUserMap().forEach((key, value)->{
+            userNameList.add(value.getUserName());
             String line = value.getUserName()+"|"+value.getPassword()+"|"+value.getRole();
             lines.add(line);
         });
         MyFileUtils.writeLinesToFileFromHead(lines, userInfoFilePath, "utf-8");
+        String developerBasePath = configuration.getDeveloperVersionBasePath();
+        List<String> developerNameBasePathList = MyFileUtils.listFilePath(developerBasePath, "dir");
+        List<String> developerNameList = new ArrayList<>();
+        for (String developerNameBasePath : developerNameBasePathList) {
+            File developerNameDir = new File(developerNameBasePath);
+            String developerName = developerNameDir.getName();
+            //判断多余
+            if (!userNameList.contains(developerName)) {
+                MyFileUtils.deleteDirOrFile(developerNameDir);
+            } else {
+                developerNameList.add(developerName);
+            }
+        }
+        for (String userName : userNameList) {
+            //判断缺少
+            if (!developerNameList.contains(userName)) {
+                MyFileUtils.createFile(developerBasePath + userName);
+            }
+        }
     }
 
     /**
@@ -121,12 +144,7 @@ public class UserService {
                 return apiResponse;
             }
             runtimeCacheService.getUserMap().put(userName, user);
-            String line = userName + "|" + password + "|" + role;
-            List<String> lines = new ArrayList<>();
-            lines.add(line);
-            //文件尾部写入数据
-            String path = configuration.getUserInfoFilePath();
-            MyFileUtils.writeLineToFileFromTail(lines, path, "utf-8");
+            rewriteUserInfoToFile();
         }
         return apiResponse;
     }

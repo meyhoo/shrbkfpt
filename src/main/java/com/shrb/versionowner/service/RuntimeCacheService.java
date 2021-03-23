@@ -156,9 +156,6 @@ public class RuntimeCacheService {
     }
 
     public DeveloperVersion getDeveloperVersion(String userId, String versionId) {
-        if(this.developerVersionMap.get(userId) == null){
-            return null;
-        }
         return this.developerVersionMap.get(userId).get(versionId);
     }
 
@@ -262,6 +259,23 @@ public class RuntimeCacheService {
             administratorVersionList.add(map);
         });
         return administratorVersionList;
+    }
+
+    public List<Map<String, Object>> getCommitterTaskList(String versionId) {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        List<String> committerUserIds = getVersionCommitters(versionId);
+        for (String userId : committerUserIds) {
+            DeveloperVersion developerVersion = getDeveloperVersion(userId, versionId);
+            List<Task> committerTaskList = developerVersion.getTaskList();
+            for (Task task : committerTaskList) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("taskInfo", task.getTaskInfo());
+                map.put("userName", task.getUserId());
+                map.put("state", task.getState());
+                resultList.add(map);
+            }
+        }
+        return resultList;
     }
 
     public List<Map<String, Object>> getDeveloperVersionList(String userName) {
