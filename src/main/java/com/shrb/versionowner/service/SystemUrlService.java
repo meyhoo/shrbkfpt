@@ -54,16 +54,18 @@ public class SystemUrlService {
         List<String> systemUrlInfoStrList = MyFileUtils.readFileAllLines(systemUrlInfoFilePath, "utf-8");
         ConcurrentHashMap<String, SystemUrl> systemUrlMap = new ConcurrentHashMap<>();
         for (String systemUrlInfoStr : systemUrlInfoStrList) {
-            String[] systemUrlInfoArray = systemUrlInfoStr.split("\\|");
-            SystemUrl systemUrl = new SystemUrl();
-            systemUrl.setSystemUrlId(systemUrlInfoArray[0]);
-            systemUrl.setDevUrl(systemUrlInfoArray[1]);
-            systemUrl.setTestUrl(systemUrlInfoArray[2]);
-            systemUrl.setZscUrl(systemUrlInfoArray[3]);
-            systemUrl.setZbUrl(systemUrlInfoArray[4]);
-            systemUrl.setPrdUrl(systemUrlInfoArray[5]);
-            systemUrl.setSystemUrlInfo(systemUrlInfoArray[6]);
-            systemUrlMap.put(systemUrl.getSystemUrlId(), systemUrl);
+            if (!StringUtils.isEmpty(systemUrlInfoStr)) {
+                String[] systemUrlInfoArray = systemUrlInfoStr.split("\\|");
+                SystemUrl systemUrl = new SystemUrl();
+                systemUrl.setSystemUrlId(systemUrlInfoArray[0]);
+                systemUrl.setDevUrl(systemUrlInfoArray[1]);
+                systemUrl.setTestUrl(systemUrlInfoArray[2]);
+                systemUrl.setZscUrl(systemUrlInfoArray[3]);
+                systemUrl.setZbUrl(systemUrlInfoArray[4]);
+                systemUrl.setPrdUrl(systemUrlInfoArray[5]);
+                systemUrl.setSystemUrlInfo(systemUrlInfoArray[6]);
+                systemUrlMap.put(systemUrl.getSystemUrlId(), systemUrl);
+            }
         }
         return systemUrlMap;
     }

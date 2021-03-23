@@ -151,11 +151,14 @@ public class RuntimeCacheService {
         return this.administratorVersionMap.get(versionId);
     }
 
-    public List<String> getVersionCommitters(String versionId) {
+    public ArrayList<String> getVersionCommitters(String versionId) {
         return this.versionCommitterMap.get(versionId);
     }
 
     public DeveloperVersion getDeveloperVersion(String userId, String versionId) {
+        if(this.developerVersionMap.get(userId) == null){
+            return null;
+        }
         return this.developerVersionMap.get(userId).get(versionId);
     }
 
@@ -282,9 +285,9 @@ public class RuntimeCacheService {
                     taskInfoList.add(taskMap);
                 }
                 map.put("taskList", taskInfoList);
+                map.put("priority", developerVersion.getPriority().toString());
             } else {
                 map.put("committerFlag", "0");
-                map.put("taskList", new ArrayList<>());
             }
             developerVersionList.add(map);
         });

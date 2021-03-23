@@ -7,6 +7,9 @@ public class DeveloperVersion {
     private String userId;
     private List<Task> taskList;
     private String taskInfoFilePath;
+    private Integer priority;
+    private String priorityInfoFilePath;
+    private String versionContentDirPath;
 
     public String getVersionId() {
         return versionId;
@@ -38,5 +41,29 @@ public class DeveloperVersion {
 
     public void setTaskInfoFilePath(String taskInfoFilePath) {
         this.taskInfoFilePath = taskInfoFilePath;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
+    public String getPriorityInfoFilePath() {
+        return priorityInfoFilePath;
+    }
+
+    public void setPriorityInfoFilePath(String priorityInfoFilePath) {
+        this.priorityInfoFilePath = priorityInfoFilePath;
+    }
+
+    public String getVersionContentDirPath() {
+        return versionContentDirPath;
+    }
+
+    public void setVersionContentDirPath(String versionContentDirPath) {
+        this.versionContentDirPath = versionContentDirPath;
     }
 }

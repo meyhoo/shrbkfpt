@@ -1,25 +1,35 @@
 package com.shrb.versionowner.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.shrb.versionowner.entity.api.ApiExtendResponse;
+import com.shrb.versionowner.entity.api.ApiResponse;
 import com.shrb.versionowner.entity.business.AdministratorVersion;
 import com.shrb.versionowner.entity.configuration.Configuration;
+import com.shrb.versionowner.lock.LockFactory;
+import com.shrb.versionowner.utils.CollectionUtils;
 import com.shrb.versionowner.utils.MyFileUtils;
+import com.shrb.versionowner.utils.WebHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AdministratorVersionService {
     private static final Logger log = LoggerFactory.getLogger(AdministratorVersionService.class);
 
-    private static final String ADMIN_VERSION_INFO_FILE_PATH = "administratorVersionInfo.dat";
+    private static final String ADMIN_VERSION_INFO_FILE_NAME = "administratorVersionInfo.dat";
 
-    private static final String VERSION_COMMITTER_FILE_PATH = "versionCommitter.dat";
+    public static final String VERSION_COMMITTER_FILE_NAME = "versionCommitter.dat";
 
     @Autowired
     private Configuration configuration;
@@ -33,7 +43,7 @@ public class AdministratorVersionService {
         List<String> dirList = MyFileUtils.listFilePath(basePath, "dir");
         for(String dirPath : dirList) {
             File dir = new File(dirPath);
-            String adminVersionInfoFilePath = dirPath + "/" + ADMIN_VERSION_INFO_FILE_PATH;
+            String adminVersionInfoFilePath = dirPath + "/" + ADMIN_VERSION_INFO_FILE_NAME;
             File adminVersionInfoFile = new File(adminVersionInfoFilePath);
             String adminVersionInfo;
             if (!adminVersionInfoFile.exists()) {
@@ -57,16 +67,89 @@ public class AdministratorVersionService {
         List<String> dirList = MyFileUtils.listFilePath(basePath, "dir");
         for(String dirPath : dirList) {
             File dir = new File(dirPath);
-            String versionCommitterFilePath = dirPath + "/" + VERSION_COMMITTER_FILE_PATH;
+            String versionCommitterFilePath = dirPath + "/" + VERSION_COMMITTER_FILE_NAME;
             String versionCommitterStr = MyFileUtils.readFileToString(versionCommitterFilePath, "utf-8");
-            String[] versionCommitters = versionCommitterStr.split("\\|");
             ArrayList<String> userIds = new ArrayList<>();
-            for(String userId : versionCommitters) {
-                userIds.add(userId);
+            if (!StringUtils.isEmpty(versionCommitterStr)) {
+                String[] versionCommitters = versionCommitterStr.split("\\|");
+                for(String userId : versionCommitters) {
+                    userIds.add(userId);
+                }
             }
             String versionId = dir.getName();
             map.put(versionId, userIds);
         }
         return map;
+    }
+
+    public ApiExtendResponse searchAdministratorVersionList(HttpServletRequest request) throws Exception {
+        JSONObject requestJson = WebHttpUtils.getHttpRequestJson(request);
+        Integer draw = Integer.parseInt(requestJson.getString("draw"));
+        Integer from = Integer.parseInt(requestJson.getString("start"));
+        Integer pageSize = Integer.parseInt(requestJson.getString("pageCount"));
+        String versionId = requestJson.getString("versionId");
+        Map<String, Object> map = new HashMap<>();
+        map.put("versionId", versionId);
+        map.put("pageSize", pageSize);
+        map.put("from", from);
+        List<Map<String, Object>> list = runtimeCacheService.getAdministratorVersionList();
+        CollectionUtils<Map<String, Object>> collectionUtils = new CollectionUtils<Map<String, Object>>(list, map);
+        CollectionUtils.ResultInfo<Map<String, Object>> resultInfo = collectionUtils.getListByFuzzyMatch();
+        ApiExtendResponse apiExtendResponse = new ApiExtendResponse();
+        apiExtendResponse.setData(resultInfo.getList());
+        apiExtendResponse.setDraw(draw);
+        apiExtendResponse.setPageCount(pageSize);
+        apiExtendResponse.setDataMaxCount(resultInfo.getCount());
+        apiExtendResponse.setDataMaxPage(resultInfo.getCount() % pageSize == 0 ? resultInfo.getCount() / pageSize : resultInfo.getCount() / pageSize + 1);
+        return apiExtendResponse;
+    }
+
+    public ApiResponse addAdministratorVersion(String versionId, String versionInfo) throws Exception {
+        ApiResponse apiResponse = new ApiResponse();
+        AdministratorVersion administratorVersion = runtimeCacheService.getAdministratorVersion(versionId);
+        if (administratorVersion != null) {
+            apiResponse.setErrorCode("999999");
+            apiResponse.setErrorMsg("版本已存在");
+            return apiResponse;
+        }
+        administratorVersion = new AdministratorVersion();
+        administratorVersion.setVersionId(versionId);
+        administratorVersion.setVersionInfo(versionInfo);
+        String basePath = configuration.getAdministratorVersionBasePath();
+        String adminVersionInfoFilePath = basePath + versionId + "/" + ADMIN_VERSION_INFO_FILE_NAME;
+        String versionCommitterFilePath = basePath + versionId + "/" + VERSION_COMMITTER_FILE_NAME;
+        administratorVersion.setVersionInfoFilePath(adminVersionInfoFilePath);
+        synchronized (LockFactory.getLock("administratorVersion_"+versionId)) {
+            if (runtimeCacheService.getAdministratorVersion(versionId) != null) {
+                apiResponse.setErrorCode("999999");
+                apiResponse.setErrorMsg("版本已存在");
+                return apiResponse;
+            }
+            runtimeCacheService.getAdministratorVersionMap().put(versionId, administratorVersion);
+            runtimeCacheService.getVersionCommitterMap().put(versionId, new ArrayList<>());
+            MyFileUtils.createFile(adminVersionInfoFilePath);
+            MyFileUtils.createFile(versionCommitterFilePath);
+            List<String> versionInfoLines = new ArrayList<>();
+            versionInfoLines.add(versionInfo);
+            MyFileUtils.writeLinesToFileFromHead(versionInfoLines, adminVersionInfoFilePath, "utf-8");
+        }
+        return apiResponse;
+    }
+
+    public ApiResponse deleteAdministratorVersion(String versionId) throws Exception {
+        ApiResponse apiResponse = new ApiResponse();
+        AdministratorVersion administratorVersion = runtimeCacheService.getAdministratorVersion(versionId);
+        if (administratorVersion == null) {
+            return apiResponse;
+        }
+        synchronized (LockFactory.getLock("administratorVersion_"+versionId)) {
+            runtimeCacheService.getAdministratorVersionMap().remove(versionId);
+            runtimeCacheService.getVersionCommitterMap().remove(versionId);
+            //移到备份目录
+            String originBasePath = configuration.getAdministratorVersionBasePath() + versionId;
+            String bakBasePath = configuration.getAdministratorVersionBakBasePath();
+            MyFileUtils.moveFileOrDir(new File(originBasePath), bakBasePath);
+        }
+        return apiResponse;
     }
 }

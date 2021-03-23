@@ -7,6 +7,8 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -264,6 +266,103 @@ public class MyFileUtils {
             }
         }
         file.delete();
+    }
+
+    public static void moveFileOrDir(File file, String aimPath) throws Exception {
+        if (file.isFile()) {
+            File newFile = new File(concatPath(aimPath, file.getName()));
+            file.renameTo(newFile);
+        }
+        if (file.isDirectory()) {
+            copyDir(file.getAbsolutePath(), aimPath);
+            deleteDirOrFile(file);
+        }
+    }
+
+    public static String concatPath(String path1, String path2) {
+        if (path1.endsWith("/")) {
+            return path1 + path2;
+        } else {
+            return path1 + "/" + path2;
+        }
+    }
+
+    /**
+     * 把整个文件夹复制到目标路径下
+     * @param dir
+     * @param newBasePath
+     */
+    public static void copyDir(String dir, String newBasePath) throws Exception {
+        File oldDir = new File(dir);
+        String oldDirName = oldDir.getName();
+        String newPath = concatPath(newBasePath, oldDirName);
+        copyFolder(dir, newPath);
+    }
+
+    /**
+     * 把整个文件夹下的内容复制到目标路径下
+     * @param oldPath
+     * @param newPath
+     */
+    private static void copyFolder(String oldPath, String newPath) throws Exception {
+        try {
+            // 如果文件夹不存在，则建立新文件夹
+            (new File(newPath)).mkdirs();
+            // 读取整个文件夹的内容到file字符串数组，下面设置一个游标i，不停地向下移开始读这个数组
+            File filelist = new File(oldPath);
+            String[] file = filelist.list();
+            // 要注意，这个temp仅仅是一个临时文件指针
+            // 整个程序并没有创建临时文件
+            File temp = null;
+            for (int i = 0; i < file.length; i++) {
+                // 如果oldPath以路径分隔符/或者\结尾，那么则oldPath/文件名就可以了
+                // 否则要自己oldPath后面补个路径分隔符再加文件名
+                // 谁知道你传递过来的参数是f:/a还是f:/a/啊？
+                if (oldPath.endsWith(File.separator)) {
+                    temp = new File(oldPath + file[i]);
+                } else {
+                    temp = new File(oldPath + File.separator + file[i]);
+                }
+
+                // 如果游标遇到文件
+                if (temp.isFile()) {
+                    FileInputStream input = new FileInputStream(temp);
+                    // 复制
+                    FileOutputStream output = new FileOutputStream(newPath
+                            + "/" + (temp.getName()).toString());
+                    try {
+                        byte[] bufferarray = new byte[1024 * 64];
+                        int prereadlength;
+                        while ((prereadlength = input.read(bufferarray)) != -1) {
+                            output.write(bufferarray, 0, prereadlength);
+                        }
+                        output.flush();
+                        output.close();
+                        input.close();
+                    } catch (Exception e) {
+                        throw e;
+                    } finally {
+                        if (output != null) {
+                            output.close();
+                        }
+                        if (input != null) {
+                            input.close();
+                        }
+                    }
+                }
+                // 如果游标遇到文件夹
+                if (temp.isDirectory()) {
+                    copyFolder(oldPath + "/" + file[i], newPath + "/" + file[i]);
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        String path = "D:/testFile/base1";
+        moveFileOrDir(new File(path), "D:/testFile/base2");
     }
 
 }
