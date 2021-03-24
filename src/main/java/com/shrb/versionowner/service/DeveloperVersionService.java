@@ -57,6 +57,22 @@ public class DeveloperVersionService {
         MyFileUtils.writeLinesToFileFromHead(lines, versionCommitterFilePath, "utf-8");
     }
 
+    public void rewriteDeveloperVersionTaskToFile(String userName, String versionId) throws Exception {
+        String basePath = configuration.getDeveloperVersionBasePath();
+        String developerVersionTaskInfoFilePath = basePath + userName + "/" + versionId + "/" + TASK_INFO_FILE_NAME;
+        DeveloperVersion developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+        List<Task> taskList = developerVersion.getTaskList();
+        List<String> taskLines = new ArrayList<>();
+        for (Task task : taskList) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(task.getUserId()).append("|")
+                    .append(task.getState()).append("|")
+                    .append(task.getTaskInfo());
+            taskLines.add(sb.toString());
+        }
+        MyFileUtils.writeLinesToFileFromHead(taskLines, developerVersionTaskInfoFilePath, "utf-8");
+    }
+
     public ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> getDeveloperVersionMap() throws Exception {
         ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> map = new ConcurrentHashMap<>();
         String basePath = configuration.getDeveloperVersionBasePath();
@@ -120,6 +136,180 @@ public class DeveloperVersionService {
         apiExtendResponse.setDataMaxCount(resultInfo.getCount());
         apiExtendResponse.setDataMaxPage(resultInfo.getCount() % pageSize == 0 ? resultInfo.getCount() / pageSize : resultInfo.getCount() / pageSize + 1);
         return apiExtendResponse;
+    }
+
+    public ApiExtendResponse searchDeveloperVersionTaskList(HttpServletRequest request, String userName) throws Exception {
+        JSONObject requestJson = WebHttpUtils.getHttpRequestJson(request);
+        Integer draw = Integer.parseInt(requestJson.getString("draw"));
+        Integer from = Integer.parseInt(requestJson.getString("start"));
+        Integer pageSize = Integer.parseInt(requestJson.getString("pageCount"));
+        String versionId = requestJson.getString("versionId");
+        Map<String, Object> map = new HashMap<>();
+        map.put("versionId", versionId);
+        map.put("pageSize", pageSize);
+        map.put("from", from);
+        List<Map<String, Object>> list = runtimeCacheService.getDeveloperVersionTaskList(userName, versionId);
+        CollectionUtils<Map<String, Object>> collectionUtils = new CollectionUtils<Map<String, Object>>(list, map);
+        CollectionUtils.ResultInfo<Map<String, Object>> resultInfo = collectionUtils.getListByFuzzyMatch();
+        ApiExtendResponse apiExtendResponse = new ApiExtendResponse();
+        apiExtendResponse.setData(resultInfo.getList());
+        apiExtendResponse.setDraw(draw);
+        apiExtendResponse.setPageCount(pageSize);
+        apiExtendResponse.setDataMaxCount(resultInfo.getCount());
+        apiExtendResponse.setDataMaxPage(resultInfo.getCount() % pageSize == 0 ? resultInfo.getCount() / pageSize : resultInfo.getCount() / pageSize + 1);
+        return apiExtendResponse;
+    }
+
+    public ApiResponse addDeveloperVersionTask(String userName, String versionId, String taskInfo) throws Exception {
+        ApiResponse apiResponse = new ApiResponse();
+        DeveloperVersion developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+        if (developerVersion == null) {
+            apiResponse.setErrorCode("999999");
+            apiResponse.setErrorMsg("developerVersion不存在");
+            return apiResponse;
+        }
+        List<Task> taskList = developerVersion.getTaskList();
+        boolean existsFlag = false;
+        for (Task e : taskList) {
+            if (taskInfo.equals(e.getTaskInfo())) {
+                existsFlag = true;
+                break;
+            }
+        }
+        if (existsFlag) {
+            apiResponse.setErrorCode("999999");
+            apiResponse.setErrorMsg("task已存在");
+            return apiResponse;
+        }
+        synchronized (LockFactory.getLock("developerVersion_"+userName+"_"+versionId)) {
+            developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+            if (developerVersion == null) {
+                apiResponse.setErrorCode("999999");
+                apiResponse.setErrorMsg("developerVersion不存在");
+                return apiResponse;
+            }
+            taskList = developerVersion.getTaskList();
+            for (Task e : taskList) {
+                if (taskInfo.equals(e.getTaskInfo())) {
+                    existsFlag = true;
+                    break;
+                }
+            }
+            if (existsFlag) {
+                apiResponse.setErrorCode("999999");
+                apiResponse.setErrorMsg("task已存在");
+                return apiResponse;
+            }
+            Task task = new Task();
+            task.setTaskInfo(taskInfo);
+            task.setUserId(userName);
+            task.setState("0");
+            taskList.add(task);
+            developerVersion.setTaskList(taskList);
+            HashMap<String, DeveloperVersion> map = runtimeCacheService.getDeveloperVersionMap().get(userName);
+            map.put(versionId, developerVersion);
+            runtimeCacheService.getDeveloperVersionMap().put(userName, map);
+            rewriteDeveloperVersionTaskToFile(userName, versionId);
+        }
+        return apiResponse;
+    }
+
+    public ApiResponse updateDeveloperVersionTaskState(String userName, String versionId, String taskInfo, String state) throws Exception {
+        ApiResponse apiResponse = new ApiResponse();
+        DeveloperVersion developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+        if (developerVersion == null) {
+            apiResponse.setErrorCode("999999");
+            apiResponse.setErrorMsg("developerVersion不存在");
+            return apiResponse;
+        }
+        List<Task> taskList = developerVersion.getTaskList();
+        boolean existsFlag = false;
+        for (Task e : taskList) {
+            if (taskInfo.equals(e.getTaskInfo())) {
+                existsFlag = true;
+                break;
+            }
+        }
+        if (!existsFlag) {
+            apiResponse.setErrorCode("999999");
+            apiResponse.setErrorMsg("task不存在");
+            return apiResponse;
+        }
+        synchronized (LockFactory.getLock("developerVersion_"+userName+"_"+versionId)) {
+            developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+            if (developerVersion == null) {
+                apiResponse.setErrorCode("999999");
+                apiResponse.setErrorMsg("developerVersion不存在");
+                return apiResponse;
+            }
+            taskList = developerVersion.getTaskList();
+            for (Task e : taskList) {
+                if (taskInfo.equals(e.getTaskInfo())) {
+                    e.setState(state);
+                    existsFlag = true;
+                    break;
+                }
+            }
+            if (!existsFlag) {
+                apiResponse.setErrorCode("999999");
+                apiResponse.setErrorMsg("task不存在");
+                return apiResponse;
+            }
+            developerVersion.setTaskList(taskList);
+            HashMap<String, DeveloperVersion> map = runtimeCacheService.getDeveloperVersionMap().get(userName);
+            map.put(versionId, developerVersion);
+            runtimeCacheService.getDeveloperVersionMap().put(userName, map);
+            rewriteDeveloperVersionTaskToFile(userName, versionId);
+        }
+        return apiResponse;
+    }
+
+    public ApiResponse deleteDeveloperVersionTask(String userName, String versionId, String taskInfo) throws Exception {
+        ApiResponse apiResponse = new ApiResponse();
+        DeveloperVersion developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+        if (developerVersion == null) {
+            apiResponse.setErrorCode("999999");
+            apiResponse.setErrorMsg("developerVersion不存在");
+            return apiResponse;
+        }
+        List<Task> taskList = developerVersion.getTaskList();
+        boolean existsFlag = false;
+        for (Task e : taskList) {
+            if (taskInfo.equals(e.getTaskInfo())) {
+                existsFlag = true;
+                break;
+            }
+        }
+        if (!existsFlag) {
+            return apiResponse;
+        }
+        synchronized (LockFactory.getLock("developerVersion_"+userName+"_"+versionId)) {
+            developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+            if (developerVersion == null) {
+                apiResponse.setErrorCode("999999");
+                apiResponse.setErrorMsg("developerVersion不存在");
+                return apiResponse;
+            }
+            taskList = developerVersion.getTaskList();
+            int index = 0;
+            for (Task e : taskList) {
+                if (taskInfo.equals(e.getTaskInfo())) {
+                    existsFlag = true;
+                    break;
+                }
+                index++;
+            }
+            if (!existsFlag) {
+                return apiResponse;
+            }
+            taskList.remove(index);
+            developerVersion.setTaskList(taskList);
+            HashMap<String, DeveloperVersion> map = runtimeCacheService.getDeveloperVersionMap().get(userName);
+            map.put(versionId, developerVersion);
+            runtimeCacheService.getDeveloperVersionMap().put(userName, map);
+            rewriteDeveloperVersionTaskToFile(userName, versionId);
+        }
+        return apiResponse;
     }
 
     public ApiResponse becomeCommitter(String versionId, String userName) throws Exception {

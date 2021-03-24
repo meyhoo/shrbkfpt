@@ -16,6 +16,7 @@ public class DeveloperRouteController {
     private static final Logger log = LoggerFactory.getLogger(DeveloperRouteController.class);
     private final static String CHOOSE_VERSION_HTML = "/developer/chooseVersionPage";
     private final static String COMMIT_VERSION_HTML = "/developer/commitVersionPage";
+    private final static String ADD_TASK_HTML = "/developer/addTaskPage";
     private final static String SELECT_TEMPLATE_GROUP_HTML = "/developer/selectTemplateGroupPage";
     private final static String SQL_AUTO_CREATE_HTML = "/developer/sqlAutoCreatePage";
 
@@ -30,6 +31,11 @@ public class DeveloperRouteController {
     @RequestMapping("/commitVersionPage.html")
     public String commitVersionPage() {
         return COMMIT_VERSION_HTML;
+    }
+
+    @RequestMapping("/addTaskPage.html")
+    public String addTaskPage() {
+        return ADD_TASK_HTML;
     }
 
     @RequestMapping("/selectTemplateGroupPage.html")

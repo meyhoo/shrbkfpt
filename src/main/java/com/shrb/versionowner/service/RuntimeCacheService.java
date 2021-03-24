@@ -58,6 +58,8 @@ public class RuntimeCacheService {
         this.administratorVersionMap = initAdministratorVersionMap();
         this.versionCommitterMap = initVersionCommitterMap();
         beforeRunAction.prepareDeveloperVersionDir();
+        //这一步检查非常重要，防止developerVersionMap漏读或错读数据
+        userService.checkDevloperDir();
         this.developerVersionMap = initDeveloperVersionMap();
     }
 
@@ -306,6 +308,20 @@ public class RuntimeCacheService {
             developerVersionList.add(map);
         });
         return developerVersionList;
+    }
+
+    public List<Map<String, Object>> getDeveloperVersionTaskList(String userName, String versionId) {
+        List<Map<String, Object>> developerVersionTaskList = new ArrayList<>();
+        DeveloperVersion developerVersion = getDeveloperVersion(userName, versionId);
+        List<Task> taskList = developerVersion.getTaskList();
+        for (Task task : taskList){
+            Map<String, Object> map = new HashMap<>();
+            map.put("taskInfo", task.getTaskInfo());
+            map.put("state", task.getState());
+            map.put("versionId", versionId);
+            developerVersionTaskList.add(map);
+        }
+        return developerVersionTaskList;
     }
 
     public ConcurrentHashMap<String, User> getUserMap() {

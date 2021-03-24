@@ -29,10 +29,12 @@ public class UserService {
     private Configuration configuration;
     @Autowired
     private RuntimeCacheService runtimeCacheService;
+    @Autowired
+    private DeveloperVersionService developerVersionService;
 
     /**
      * 把缓存中的用户数据批量写入到文件中
-     * 同时检查developer目录，多余的删除，缺少的创建
+     * 同时检查developer目录，多余的删除，缺少的创建，并写入缓存
      * @throws Exception
      */
     public void rewriteUserInfoToFile() throws Exception {
@@ -45,6 +47,37 @@ public class UserService {
             lines.add(line);
         });
         MyFileUtils.writeLinesToFileFromHead(lines, userInfoFilePath, "utf-8");
+        String developerBasePath = configuration.getDeveloperVersionBasePath();
+        List<String> developerNameBasePathList = MyFileUtils.listFilePath(developerBasePath, "dir");
+        List<String> developerNameList = new ArrayList<>();
+        for (String developerNameBasePath : developerNameBasePathList) {
+            File developerNameDir = new File(developerNameBasePath);
+            String developerName = developerNameDir.getName();
+            //判断多余
+            if (!userNameList.contains(developerName)) {
+                MyFileUtils.deleteDirOrFile(developerNameDir);
+            } else {
+                developerNameList.add(developerName);
+            }
+        }
+        for (String userName : userNameList) {
+            //判断缺少
+            if (!developerNameList.contains(userName)) {
+                MyFileUtils.createFile(developerBasePath + userName);
+            }
+        }
+        runtimeCacheService.setDeveloperVersionMap(developerVersionService.getDeveloperVersionMap());
+    }
+
+    /**
+     * 检查developer目录，多余的删除，缺少的创建
+     * @throws Exception
+     */
+    public void checkDevloperDir() throws Exception {
+        List<String> userNameList = new ArrayList<>();
+        runtimeCacheService.getUserMap().forEach((key, value)->{
+            userNameList.add(value.getUserName());
+        });
         String developerBasePath = configuration.getDeveloperVersionBasePath();
         List<String> developerNameBasePathList = MyFileUtils.listFilePath(developerBasePath, "dir");
         List<String> developerNameList = new ArrayList<>();

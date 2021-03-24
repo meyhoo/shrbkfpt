@@ -35,6 +35,58 @@ public class DeveloperVersionController {
     }
 
     @ApiRsp
+    @RequestMapping(value = "/searchDeveloperVersionTaskList", method = RequestMethod.POST)
+    @ResponseBody
+    public ApiResponse searchDeveloperVersionTaskList(HttpServletRequest request) throws Exception {
+        Object obj = SecurityUtils.getSubject().getPrincipal();
+        if (obj != null) {
+            User user = (User) obj;
+            ApiExtendResponse apiResponse = developerVersionService.searchDeveloperVersionTaskList(request, user.getUserName());
+            return apiResponse;
+        }
+        throw new Exception("登录超时");
+    }
+
+    @ApiRsp
+    @RequestMapping(value = "/addDeveloperVersionTask", method = RequestMethod.POST)
+    @ResponseBody
+    public ApiResponse addDeveloperVersionTask(String versionId, String taskInfo) throws Exception {
+        Object obj = SecurityUtils.getSubject().getPrincipal();
+        if (obj != null) {
+            User user = (User) obj;
+            ApiResponse apiResponse = developerVersionService.addDeveloperVersionTask(user.getUserName(), versionId, taskInfo);
+            return apiResponse;
+        }
+        throw new Exception("登录超时");
+    }
+
+    @ApiRsp
+    @RequestMapping(value = "/updateDeveloperVersionTaskState", method = RequestMethod.POST)
+    @ResponseBody
+    public ApiResponse updateDeveloperVersionTaskState(String versionId, String taskInfo, String state) throws Exception {
+        Object obj = SecurityUtils.getSubject().getPrincipal();
+        if (obj != null) {
+            User user = (User) obj;
+            ApiResponse apiResponse = developerVersionService.updateDeveloperVersionTaskState(user.getUserName(), versionId, taskInfo, state);
+            return apiResponse;
+        }
+        throw new Exception("登录超时");
+    }
+
+    @ApiRsp
+    @RequestMapping(value = "/deleteDeveloperVersionTask", method = RequestMethod.POST)
+    @ResponseBody
+    public ApiResponse deleteDeveloperVersionTask(String versionId, String taskInfo) throws Exception {
+        Object obj = SecurityUtils.getSubject().getPrincipal();
+        if (obj != null) {
+            User user = (User) obj;
+            ApiResponse apiResponse = developerVersionService.deleteDeveloperVersionTask(user.getUserName(), versionId, taskInfo);
+            return apiResponse;
+        }
+        throw new Exception("登录超时");
+    }
+
+    @ApiRsp
     @RequestMapping(value = "/becomeCommitter", method = RequestMethod.POST)
     @ResponseBody
     public ApiResponse becomeCommitter(String versionId) throws Exception {
