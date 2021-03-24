@@ -74,6 +74,19 @@ public class DeveloperVersionController {
     }
 
     @ApiRsp
+    @RequestMapping(value = "/updateDeveloperVersionPriority", method = RequestMethod.POST)
+    @ResponseBody
+    public ApiResponse updateDeveloperVersionPriority(String versionId, String priority) throws Exception {
+        Object obj = SecurityUtils.getSubject().getPrincipal();
+        if (obj != null) {
+            User user = (User) obj;
+            ApiResponse apiResponse = developerVersionService.updateDeveloperVersionPriority(user.getUserName(), versionId, priority);
+            return apiResponse;
+        }
+        throw new Exception("登录超时");
+    }
+
+    @ApiRsp
     @RequestMapping(value = "/deleteDeveloperVersionTask", method = RequestMethod.POST)
     @ResponseBody
     public ApiResponse deleteDeveloperVersionTask(String versionId, String taskInfo) throws Exception {

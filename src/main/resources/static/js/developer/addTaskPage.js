@@ -28,7 +28,6 @@ $("#basic_validate").validate({
 //avalon初始化
 var vmcontent = avalon.define({
     $id: "bodyController",
-    showDialog: "sub1",
     saveParams: {
         versionId:"",
         taskInfo:""

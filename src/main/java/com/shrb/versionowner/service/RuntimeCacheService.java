@@ -273,6 +273,7 @@ public class RuntimeCacheService {
                 Map<String, Object> map = new HashMap<>();
                 map.put("taskInfo", task.getTaskInfo());
                 map.put("userName", task.getUserId());
+                map.put("versionId", versionId);
                 map.put("state", task.getState());
                 resultList.add(map);
             }

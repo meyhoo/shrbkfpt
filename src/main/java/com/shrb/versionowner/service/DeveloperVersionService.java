@@ -73,6 +73,15 @@ public class DeveloperVersionService {
         MyFileUtils.writeLinesToFileFromHead(taskLines, developerVersionTaskInfoFilePath, "utf-8");
     }
 
+    public void rewriteDeveloperVersionPriorityToFile(String userName, String versionId) throws Exception {
+        String basePath = configuration.getDeveloperVersionBasePath();
+        String developerVersionPriorityInfoFilePath = basePath + userName + "/" + versionId + "/" + PRIORITY_INFO_FILE_NAME;
+        DeveloperVersion developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+        List<String> priorityLines = new ArrayList<>();
+        priorityLines.add(developerVersion.getPriority().toString());
+        MyFileUtils.writeLinesToFileFromHead(priorityLines, developerVersionPriorityInfoFilePath, "utf-8");
+    }
+
     public ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> getDeveloperVersionMap() throws Exception {
         ConcurrentHashMap<String, HashMap<String, DeveloperVersion>> map = new ConcurrentHashMap<>();
         String basePath = configuration.getDeveloperVersionBasePath();
@@ -210,6 +219,30 @@ public class DeveloperVersionService {
             map.put(versionId, developerVersion);
             runtimeCacheService.getDeveloperVersionMap().put(userName, map);
             rewriteDeveloperVersionTaskToFile(userName, versionId);
+        }
+        return apiResponse;
+    }
+
+    public ApiResponse updateDeveloperVersionPriority(String userName, String versionId, String priority) throws Exception {
+        ApiResponse apiResponse = new ApiResponse();
+        DeveloperVersion developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+        if (developerVersion == null) {
+            apiResponse.setErrorCode("999999");
+            apiResponse.setErrorMsg("developerVersion不存在");
+            return apiResponse;
+        }
+        synchronized (LockFactory.getLock("developerVersion_"+userName+"_"+versionId)) {
+            developerVersion = runtimeCacheService.getDeveloperVersion(userName, versionId);
+            if (developerVersion == null) {
+                apiResponse.setErrorCode("999999");
+                apiResponse.setErrorMsg("developerVersion不存在");
+                return apiResponse;
+            }
+            developerVersion.setPriority(Integer.parseInt(priority));
+            HashMap<String, DeveloperVersion> map = runtimeCacheService.getDeveloperVersionMap().get(userName);
+            map.put(versionId, developerVersion);
+            runtimeCacheService.getDeveloperVersionMap().put(userName, map);
+            rewriteDeveloperVersionPriorityToFile(userName, versionId);
         }
         return apiResponse;
     }

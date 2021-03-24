@@ -155,16 +155,49 @@ var vmcontent = avalon.define({
         });
     },
 
+    saveAction: function(){
+        if ($("#basic_validate").valid()) {
+            cldsLoading();
+            $.ajax({
+                type : "post",
+                url : window.baseUrl + '/developer/updateDeveloperVersionPriority',
+                data : vmcontent.saveParams,
+                dataType : "json",
+                success : function(res) {
+                    if (res.errorCode=='000000') {
+                        /*回调函数*/
+                        cldsLoaded();
+                        window.parent.layer.msg('修改成功', {icon: 1}, {time : 1000});
+                        /*刷新表格*/
+                        window.parent.tableObj.ajax.reload();
+                        /*返回表格*/
+                        vmcontent.returnBack();
+                    } else{
+                        /* 回调函数 */
+                        cldsLoaded();
+                        layer.msg('修改失败,' + res.message, {icon: 2}, {time : 1000});
+                    }
+                },
+                error: function(err) {
+                    /*回调函数*/
+                    cldsLoaded();
+                    layer.msg('连接错误', {icon: 2}, {time:1000});
+                }
+            });
+        }
+    },
+
     changeDialog: function(t, id) {
         if(t == "add"){
-            console.log(window.baseUrl)
-            console.log($("#subFrame1"))
-            $("#subFrame1").attr("src", window.baseUrl + "/developer/addTaskPage.html");
+            window.editData = {
+                versionId:vmcontent.saveParams.versionId
+            };
+            $("#subFrame").attr("src", window.baseUrl + "/developer/addTaskPage.html");
         }
         if(t == "main"){
-            window.vmcontent.showDialog = "main";
+            vmcontent.showDialog = "main";
         }else {
-            window.parent.vmcontent.showDialog = "sub1";
+            vmcontent.showDialog = "sub";
         }
     },
 
