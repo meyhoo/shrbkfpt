@@ -157,6 +157,8 @@ var vmcontent = avalon.define({
 
     changeDialog: function(t, id) {
         if(t == "add"){
+            console.log(window.baseUrl)
+            console.log($("#subFrame1"))
             $("#subFrame1").attr("src", window.baseUrl + "/developer/addTaskPage.html");
         }
         if(t == "main"){
