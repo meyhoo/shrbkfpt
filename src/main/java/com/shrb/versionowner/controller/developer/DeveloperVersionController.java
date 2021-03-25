@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -132,42 +133,8 @@ public class DeveloperVersionController {
     }
 
     @RequestMapping(value = "/downloadVersionTemplate", method = RequestMethod.GET)
-    public void downloadVersionTemplate(HttpServletResponse resp, String versionId) {
-        File file = new File("D:/versionowner/data/developer/admin/version_20210325/taskInfo.dat");
-        resp.setHeader("content-type", "application/octet-stream");
-        resp.setContentType("application/octet-stream");
-        resp.setHeader("Content-Disposition", "attachment;filename=" + "taskInfo.dat");
-        byte[] buff = new byte[1024];
-        BufferedInputStream bis = null;
-        OutputStream os = null;
-        try {
-            os = resp.getOutputStream();
-            bis = new BufferedInputStream(new FileInputStream(file));
-            int i = bis.read(buff);
-            while (i != -1) {
-                os.write(buff, 0, buff.length);
-                os.flush();
-                i = bis.read(buff);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
+    public void downloadVersionTemplate(HttpServletResponse resp, @RequestParam("versionId") String versionId) throws Exception {
+        developerVersionService.downloadVersionTemplate(resp, versionId);
     }
 
 }

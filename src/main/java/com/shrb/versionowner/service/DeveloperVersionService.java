@@ -18,7 +18,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.shrb.versionowner.service.AdministratorVersionService.VERSION_COMMITTER_FILE_NAME;
+import static com.shrb.versionowner.service.AdministratorVersionService.VERSION_CONTENT_TEMPLATE_DIR_NAME;
 
 @Service
 public class DeveloperVersionService {
@@ -353,8 +355,7 @@ public class DeveloperVersionService {
             apiResponse.setErrorMsg("你已经是版本提交者了");
             return apiResponse;
         }
-        String devTemplatePath = configuration.getDevTemplatePath();
-        //TODO 生成初始版本zip
+
         synchronized (LockFactory.getLock("versionCommitter_"+versionId)) {
             ArrayList<String> committerList = runtimeCacheService.getVersionCommitters(versionId);
             if (committerList.contains(userName)) {
@@ -403,5 +404,40 @@ public class DeveloperVersionService {
         }
         String versionContentBasePath = configuration.getDeveloperVersionBasePath() + "/" + userName + "/" + versionId + VERSION_CONTENT_DIR_NAME;
 
+    }
+
+    public void downloadVersionTemplate(HttpServletResponse resp, String versionId) throws Exception {
+        String fileName = versionId + ".zip";
+        String versionTemplateFilePath = configuration.getAdministratorVersionBasePath() + versionId + "/" + VERSION_CONTENT_TEMPLATE_DIR_NAME + "/" + fileName;
+        File file = new File(versionTemplateFilePath);
+        if (!file.exists()) {
+            String devTemplatePath = configuration.getDevTemplatePath();
+            MyFileUtils.compressZip(devTemplatePath, versionTemplateFilePath, versionId);
+        }
+        resp.setHeader("content-type", "application/octet-stream");
+        resp.setContentType("application/octet-stream");
+        resp.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        byte[] buff = new byte[1024];
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+        try {
+            os = resp.getOutputStream();
+            bis = new BufferedInputStream(new FileInputStream(file));
+            int i = bis.read(buff);
+            while (i != -1) {
+                os.write(buff, 0, buff.length);
+                os.flush();
+                i = bis.read(buff);
+            }
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (bis != null) {
+                bis.close();
+            }
+            if (os != null) {
+                os.close();
+            }
+        }
     }
 }

@@ -371,6 +371,8 @@ public class MyFileUtils {
         BufferedOutputStream bos = null;
         FileOutputStream fos = null;
         try {
+            PathJudgeResult pathJudgeResult = getPathJudgeResult(destPath);
+            createFile(pathJudgeResult.getBasePath());
             File file = new File(srcPath);
             fos = new FileOutputStream(destPath);
             bos = new BufferedOutputStream(fos);
@@ -382,7 +384,6 @@ public class MyFileUtils {
             throw e;
         } finally {
             if (zipOutput!=null) {
-                zipOutput.closeEntry();
                 zipOutput.close();
             }
             if (bos!=null) {
