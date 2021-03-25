@@ -29,6 +29,9 @@ public class Configuration {
     @Value("${configuration.filepath.administrator.version.bak.basePath}")
     private String administratorVersionBakBasePath;
 
+    @Value("${configuration.filepath.dev.origin.template.basePath}")
+    private String devTemplatePath;
+
     public String getUserInfoFilePath() {
         return userInfoFilePath;
     }
@@ -59,5 +62,9 @@ public class Configuration {
 
     public String getAdministratorVersionBakBasePath() {
         return administratorVersionBakBasePath;
+    }
+
+    public String getDevTemplatePath() {
+        return devTemplatePath;
     }
 }

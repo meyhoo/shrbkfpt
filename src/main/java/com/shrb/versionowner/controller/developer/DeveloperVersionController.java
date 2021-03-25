@@ -11,8 +11,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 
 @Controller
 @RequestMapping("/developer")
@@ -111,4 +115,59 @@ public class DeveloperVersionController {
         }
         throw new Exception("登录超时");
     }
+
+    @RequestMapping(value = "/uploadVersion", method = RequestMethod.POST)
+    public String uploadVersion(String versionId, MultipartFile[] avatar) {
+        Object obj = SecurityUtils.getSubject().getPrincipal();
+        if (obj != null) {
+            User user = (User) obj;
+            try {
+                developerVersionService.uploadVersionFile(user.getUserName(), versionId, avatar);
+                return "/developer/chooseVersionPage";
+            } catch (Exception e) {
+                return "/errorPage";
+            }
+        }
+        return "/errorPage";
+    }
+
+    @RequestMapping(value = "/downloadVersionTemplate", method = RequestMethod.GET)
+    public void downloadVersionTemplate(HttpServletResponse resp, String versionId) {
+        File file = new File("D:/versionowner/data/developer/admin/version_20210325/taskInfo.dat");
+        resp.setHeader("content-type", "application/octet-stream");
+        resp.setContentType("application/octet-stream");
+        resp.setHeader("Content-Disposition", "attachment;filename=" + "taskInfo.dat");
+        byte[] buff = new byte[1024];
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+        try {
+            os = resp.getOutputStream();
+            bis = new BufferedInputStream(new FileInputStream(file));
+            int i = bis.read(buff);
+            while (i != -1) {
+                os.write(buff, 0, buff.length);
+                os.flush();
+                i = bis.read(buff);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
 }

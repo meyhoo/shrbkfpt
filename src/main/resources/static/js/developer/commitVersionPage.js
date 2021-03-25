@@ -167,11 +167,11 @@ var vmcontent = avalon.define({
                     if (res.errorCode=='000000') {
                         /*回调函数*/
                         cldsLoaded();
-                        window.parent.layer.msg('修改成功', {icon: 1}, {time : 1000});
+                        window.layer.msg('修改成功', {icon: 1}, {time : 1000});
                         /*刷新表格*/
                         window.parent.tableObj.ajax.reload();
-                        /*返回表格*/
-                        vmcontent.returnBack();
+                        // /*返回表格*/
+                        // vmcontent.returnBack();
                     } else{
                         /* 回调函数 */
                         cldsLoaded();

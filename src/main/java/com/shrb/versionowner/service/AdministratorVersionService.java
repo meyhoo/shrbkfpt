@@ -31,6 +31,8 @@ public class AdministratorVersionService {
 
     public static final String VERSION_COMMITTER_FILE_NAME = "versionCommitter.dat";
 
+    private static final String VERSION_CONTENT_TEMPLATE_DIR_NAME = "/versionContentTemplate";
+
     @Autowired
     private Configuration configuration;
 
@@ -140,6 +142,7 @@ public class AdministratorVersionService {
         String basePath = configuration.getAdministratorVersionBasePath();
         String adminVersionInfoFilePath = basePath + versionId + "/" + ADMIN_VERSION_INFO_FILE_NAME;
         String versionCommitterFilePath = basePath + versionId + "/" + VERSION_COMMITTER_FILE_NAME;
+        String versionContentTemplateDirPath = basePath + versionId + VERSION_CONTENT_TEMPLATE_DIR_NAME;
         administratorVersion.setVersionInfoFilePath(adminVersionInfoFilePath);
         synchronized (LockFactory.getLock("administratorVersion_"+versionId)) {
             if (runtimeCacheService.getAdministratorVersion(versionId) != null) {

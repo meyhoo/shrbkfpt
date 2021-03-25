@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -352,6 +353,8 @@ public class DeveloperVersionService {
             apiResponse.setErrorMsg("你已经是版本提交者了");
             return apiResponse;
         }
+        String devTemplatePath = configuration.getDevTemplatePath();
+        //TODO 生成初始版本zip
         synchronized (LockFactory.getLock("versionCommitter_"+versionId)) {
             ArrayList<String> committerList = runtimeCacheService.getVersionCommitters(versionId);
             if (committerList.contains(userName)) {
@@ -394,5 +397,11 @@ public class DeveloperVersionService {
         return apiResponse;
     }
 
+    public void uploadVersionFile(String userName, String versionId, MultipartFile[] files) throws Exception {
+        if (files == null || files.length == 0) {
+            return;
+        }
+        String versionContentBasePath = configuration.getDeveloperVersionBasePath() + "/" + userName + "/" + versionId + VERSION_CONTENT_DIR_NAME;
 
+    }
 }
