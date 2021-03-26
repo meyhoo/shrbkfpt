@@ -143,7 +143,7 @@ public class AdministratorVersionService {
         String adminVersionInfoFilePath = basePath + versionId + "/" + ADMIN_VERSION_INFO_FILE_NAME;
         String versionCommitterFilePath = basePath + versionId + "/" + VERSION_COMMITTER_FILE_NAME;
         String versionContentTemplateFilePath = basePath + versionId + VERSION_CONTENT_TEMPLATE_DIR_NAME + "/" + versionId + ".zip";
-        String devTemplatePath = configuration.getDevTemplatePath();
+        String devTemplatePath = configuration.getDevTemplateUnzipDirPath();
         administratorVersion.setVersionInfoFilePath(adminVersionInfoFilePath);
         synchronized (LockFactory.getLock("administratorVersion_"+versionId)) {
             if (runtimeCacheService.getAdministratorVersion(versionId) != null) {

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,34 @@ public class BeforeRunAction {
                 log.info("开始生成文件：{}", path);
             }
             MyFileUtils.writeLinesToFileFromHead(lines, path, "utf-8");
+        }
+    }
+
+    public void prepareUnzipDevTemplate() throws Exception {
+        //模板源文件zip
+        String srcPath = configuration.getDevTemplatePath();
+        //解压到目标路径
+        String destPath = configuration.getDevTemplateUnzipBasePath();
+        //解压后的一级目录
+        String unzipDirPath = configuration.getDevTemplateUnzipDirPath();
+        File file = new File(unzipDirPath);
+        if (!file.exists()) {
+            log.info("开始解压：{}，目标路径：{}", srcPath, destPath);
+            MyFileUtils.decompressZip(srcPath, destPath);
+        }
+    }
+
+    public void prepareUnzipAdminTemplate() throws Exception {
+        //模板源文件zip
+        String srcPath = configuration.getAdminTemplatePath();
+        //解压到目标路径
+        String destPath = configuration.getAdminTemplateUnzipBasePath();
+        //解压后的一级目录
+        String unzipDirPath = configuration.getAdminTemplateUnzipDirPath();
+        File file = new File(unzipDirPath);
+        if (!file.exists()) {
+            log.info("开始解压：{}，目标路径：{}", srcPath, destPath);
+            MyFileUtils.decompressZip(srcPath, destPath);
         }
     }
 

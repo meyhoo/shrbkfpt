@@ -1,15 +1,18 @@
 package com.shrb.versionowner.utils;
 
 import java.io.*;
+import java.util.Enumeration;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class TestZip {
     public static void main(String[] args) throws Exception {
-        String entry = "D:\\javaProjects\\versionowner\\src\\main\\resources\\devTemplate";//需要压缩的文件目录
-        String outPath = "D:\\testFile\\version_20210325.zip";
-        String base = "version_20210325";
-        compressZip(entry, outPath, base);
+        String srcPath = "D:/javaProjects/versionowner/target/classes/devTemplate/devTemplate.zip";
+        //String srcPath = "D:/javaProjects/versionowner/src/main/resources/devTemplate/devTemplate.zip";
+        String destPath = "D:/versionowner/config/";
+        //extractTo(new File(srcPath), new File(destPath));
+        MyFileUtils.decompressZip(srcPath, destPath);
     }
 
     /**
@@ -76,4 +79,55 @@ public class TestZip {
         }
         bis.close();
     }
+
+    @SuppressWarnings("unchecked")
+    public static String extractTo( File src, File dest ) throws Exception {
+        org.apache.tools.zip.ZipFile zip = new org.apache.tools.zip.ZipFile( src );
+        Enumeration< ? extends org.apache.tools.zip.ZipEntry > entries = zip.getEntries();
+        org.apache.tools.zip.ZipEntry entry = null;
+        File file = null;
+        InputStream zis = null;
+        String rootPath = dest.getAbsolutePath();
+        for ( ; entries.hasMoreElements(); ) {
+            entry = entries.nextElement();
+            try {
+                zis = zip.getInputStream( entry );
+                file = new File( dest.getAbsolutePath() + "/" + entry.getName() );
+                if ( ! file.getParentFile().exists() ) {
+                    file.getParentFile().mkdirs();
+                }
+                if ( entry.isDirectory() ) {
+                    if ( file.getParentFile().getAbsolutePath().equals(
+                            dest.getAbsolutePath() ) ) {
+                        rootPath = dest.getAbsolutePath();
+                    }
+                    mkdir( file );
+                } else {
+                    if(!file.exists()){
+                        file.createNewFile();
+                    }
+                    FileOutputStream fos = new FileOutputStream( file );
+                    int n = 0;
+                    byte[] temp = new byte[ 1024 ];
+                    while ( ( n = zis.read( temp ) ) != -1 ) {
+                        fos.write( temp, 0, n );
+                    }
+                    fos.close();
+                    fos = null;
+                }
+            } finally {
+                if ( zis != null ) {
+                    zis.close();
+                    zis = null;
+                }
+            }
+        }
+        zip.close();
+        return rootPath;
+    }
+
+    private static void mkdir( File file ) {
+        file.mkdir();
+    }
+
 }

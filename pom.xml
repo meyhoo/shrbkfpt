@@ -81,6 +81,12 @@
             <version>1.2.75</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.10.5</version>
+        </dependency>
+
     </dependencies>
 
 <!--    <dependencyManagement>-->

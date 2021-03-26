@@ -6,6 +6,7 @@ import com.shrb.versionowner.entity.api.ApiResponse;
 import com.shrb.versionowner.entity.business.DeveloperVersion;
 import com.shrb.versionowner.entity.business.Task;
 import com.shrb.versionowner.entity.configuration.Configuration;
+import com.shrb.versionowner.entity.file.PathJudgeResult;
 import com.shrb.versionowner.lock.LockFactory;
 import com.shrb.versionowner.utils.CollectionUtils;
 import com.shrb.versionowner.utils.MyFileUtils;
@@ -403,7 +404,22 @@ public class DeveloperVersionService {
             return;
         }
         String versionContentBasePath = configuration.getDeveloperVersionBasePath() + "/" + userName + "/" + versionId + VERSION_CONTENT_DIR_NAME;
-
+        File zipBaseDir = new File(versionContentBasePath + "/" + versionId);
+        if (zipBaseDir.exists()) {
+            MyFileUtils.deleteDirOrFile(zipBaseDir);
+        }
+        for (MultipartFile file : files) {
+            String filePath = versionContentBasePath + "/" + file.getOriginalFilename();
+            PathJudgeResult pathJudgeResult = MyFileUtils.getPathJudgeResult(filePath);
+            String dirPath = pathJudgeResult.getBasePath();
+            File dir = new File(dirPath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            File dest = new File(filePath);
+            log.info("上传{}...到{}", file.getOriginalFilename(), filePath);
+            file.transferTo(dest);
+        }
     }
 
     public void downloadVersionTemplate(HttpServletResponse resp, String versionId) throws Exception {
@@ -411,7 +427,7 @@ public class DeveloperVersionService {
         String versionTemplateFilePath = configuration.getAdministratorVersionBasePath() + versionId + "/" + VERSION_CONTENT_TEMPLATE_DIR_NAME + "/" + fileName;
         File file = new File(versionTemplateFilePath);
         if (!file.exists()) {
-            String devTemplatePath = configuration.getDevTemplatePath();
+            String devTemplatePath = configuration.getDevTemplateUnzipDirPath();
             MyFileUtils.compressZip(devTemplatePath, versionTemplateFilePath, versionId);
         }
         resp.setHeader("content-type", "application/octet-stream");

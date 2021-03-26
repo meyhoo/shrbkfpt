@@ -2,6 +2,10 @@ package com.shrb.versionowner.entity.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 @Component
 public class Configuration {
@@ -31,6 +35,21 @@ public class Configuration {
 
     @Value("${configuration.filepath.dev.origin.template.basePath}")
     private String devTemplatePath;
+
+    @Value("${configuration.filepath.admin.origin.template.basePath}")
+    private String adminTemplatePath;
+
+    @Value("${configuration.filepath.devtemplate.unzip.basePath}")
+    private String devTemplateUnzipBasePath;
+
+    @Value("${configuration.filepath.devtemplate.unzip.dirPath}")
+    private String devTemplateUnzipDirPath;
+
+    @Value("${configuration.filepath.admintemplate.unzip.basePath}")
+    private String adminTemplateUnzipBasePath;
+
+    @Value("${configuration.filepath.admintemplate.unzip.dirPath}")
+    private String adminTemplateUnzipDirPath;
 
     public String getUserInfoFilePath() {
         return userInfoFilePath;
@@ -64,7 +83,29 @@ public class Configuration {
         return administratorVersionBakBasePath;
     }
 
-    public String getDevTemplatePath() {
-        return devTemplatePath;
+    public String getDevTemplatePath() throws FileNotFoundException {
+        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        return path.getAbsolutePath() + devTemplatePath;
+    }
+
+    public String getAdminTemplatePath() throws FileNotFoundException {
+        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        return path.getAbsolutePath() + adminTemplatePath;
+    }
+
+    public String getDevTemplateUnzipBasePath() {
+        return devTemplateUnzipBasePath;
+    }
+
+    public String getDevTemplateUnzipDirPath() {
+        return devTemplateUnzipDirPath;
+    }
+
+    public String getAdminTemplateUnzipBasePath() {
+        return adminTemplateUnzipBasePath;
+    }
+
+    public String getAdminTemplateUnzipDirPath() {
+        return adminTemplateUnzipDirPath;
     }
 }

@@ -48,6 +48,8 @@ public class RuntimeCacheService {
     private void init() throws Exception {
         beforeRunAction.prepareUserInfoFile();
         this.userMap = initUserMap();
+        beforeRunAction.prepareUnzipDevTemplate();
+        beforeRunAction.prepareUnzipAdminTemplate();
         beforeRunAction.prepareSqlTemplateDir();
         this.sqlTemplateMap = initSqlTemplateMap();
         beforeRunAction.prepareSqlTemplateGroupDir();

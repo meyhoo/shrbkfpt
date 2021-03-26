@@ -1,6 +1,5 @@
 package com.shrb.versionowner.utils;
 
-import com.shrb.versionowner.entity.business.User;
 import com.shrb.versionowner.entity.file.MyFile;
 import com.shrb.versionowner.entity.file.PathJudgeResult;
 import org.apache.commons.io.FileUtils;
@@ -13,9 +12,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicStampedReference;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -426,9 +424,60 @@ public class MyFileUtils {
         bis.close();
     }
 
-    public static void main(String[] args) throws Exception {
-        String path = "D:/testFile/base1";
-        moveFileOrDir(new File(path), "D:/testFile/base2");
+    @SuppressWarnings("unchecked")
+    public static void decompressZip(String srcPath, String destPath) throws Exception {
+        File src = new File(srcPath);
+        File dest = new File(destPath);
+        extractTo(src, dest);
+    }
+
+    private static String extractTo(File src, File dest) throws Exception {
+        org.apache.tools.zip.ZipFile zip = new org.apache.tools.zip.ZipFile(src);
+        Enumeration<? extends org.apache.tools.zip.ZipEntry> entries = zip.getEntries();
+        org.apache.tools.zip.ZipEntry entry = null;
+        File file = null;
+        InputStream zis = null;
+        String rootPath = dest.getAbsolutePath();
+        for (; entries.hasMoreElements(); ) {
+            entry = entries.nextElement();
+            try {
+                zis = zip.getInputStream(entry);
+                file = new File(dest.getAbsolutePath() + "/" + entry.getName());
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                if (entry.isDirectory()) {
+                    if (file.getParentFile().getAbsolutePath().equals(
+                            dest.getAbsolutePath())) {
+                        rootPath = dest.getAbsolutePath();
+                    }
+                    mkdir(file);
+                } else {
+                    if (!file.exists()) {
+                        file.createNewFile();
+                    }
+                    FileOutputStream fos = new FileOutputStream(file);
+                    int n = 0;
+                    byte[] temp = new byte[1024];
+                    while ((n = zis.read(temp)) != -1) {
+                        fos.write(temp, 0, n);
+                    }
+                    fos.close();
+                    fos = null;
+                }
+            } finally {
+                if (zis != null) {
+                    zis.close();
+                    zis = null;
+                }
+            }
+        }
+        zip.close();
+        return rootPath;
+    }
+
+    private static void mkdir( File file ) {
+        file.mkdir();
     }
 
 }
