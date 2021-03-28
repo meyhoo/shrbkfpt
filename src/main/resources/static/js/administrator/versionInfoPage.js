@@ -93,36 +93,6 @@ var vmcontent = avalon.define({
         versionInfo:""
     },
 
-    //下载
-    downloadAction: function(){
-        cldsLoading();
-        $.ajax({
-            type: "post",
-            url: window.baseUrl + '/xx/xxx',
-            data: vmcontent.saveParams,
-            dataType: "json",
-            success: function (res) {
-                if (res.errorCode == '000000') {
-                    /*回调函数*/
-                    cldsLoaded();
-                    window.parent.layer.msg('修改成功', {icon: 1}, {time: 1000});
-                    /*刷新表格*/
-                    window.parent.tableObj.ajax.reload();
-                    /*返回表格*/
-                    vmcontent.returnBack();
-                } else {
-                    /* 回调函数 */
-                    cldsLoaded();
-                    layer.msg('修改失败,' + res.message, {icon: 2}, {time: 1000});
-                }
-            },
-            error: function (err) {
-                /*回调函数*/
-                cldsLoaded();
-                layer.msg('连接错误', {icon: 2}, {time: 1000});
-            }
-        });
-    },
     returnBack: function(){
         window.parent.vmcontent.changeDialog("main");
     }

@@ -72,6 +72,9 @@ public class MyFileUtils {
         }
         pathJudgeResult.setExistFlag(false);
         int lastSeparatorIndex = path.lastIndexOf("/");
+        if (lastSeparatorIndex == -1) {
+            lastSeparatorIndex = path.lastIndexOf("\\");
+        }
         String basePath;
         if (path.contains(".")) {
             //是文件
@@ -138,7 +141,7 @@ public class MyFileUtils {
      * @param destPath
      * @throws Exception
      */
-    public static void copyFile(String srcPath, String destPath) throws Exception{
+    public static void copyFile(String srcPath, String destPath) throws Exception {
         FileUtils.copyFile(new File(srcPath), new File(destPath));
     }
 
@@ -301,7 +304,7 @@ public class MyFileUtils {
      * @param oldPath
      * @param newPath
      */
-    private static void copyFolder(String oldPath, String newPath) throws Exception {
+    public static void copyFolder(String oldPath, String newPath) throws Exception {
         try {
             // 如果文件夹不存在，则建立新文件夹
             (new File(newPath)).mkdirs();
@@ -394,10 +397,11 @@ public class MyFileUtils {
     }
 
     private static void compressZip(ZipOutputStream zipOutput, File file, String base) throws IOException {
+        base = base.replaceAll("\\\\","/");
         if(file.isDirectory()){
             File[] listFiles = file.listFiles();// 列出所有的文件
             if (listFiles == null || listFiles.length == 0) {
-                zipOutput.putNextEntry(new ZipEntry(base+"/"));
+                zipOutput.putNextEntry(new ZipEntry(base + "/"));
                 zipOutput.closeEntry();
             }
             for(File fi : listFiles){
@@ -424,6 +428,12 @@ public class MyFileUtils {
         bis.close();
     }
 
+    /**
+     * 解压zip到指定目录
+     * @param srcPath
+     * @param destPath
+     * @throws Exception
+     */
     @SuppressWarnings("unchecked")
     public static void decompressZip(String srcPath, String destPath) throws Exception {
         File src = new File(srcPath);

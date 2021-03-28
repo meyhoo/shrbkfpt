@@ -16,7 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,9 @@ public class AdministratorVersionService {
 
     @Autowired
     private RuntimeCacheService runtimeCacheService;
+
+    @Autowired
+    private MergeVersionService mergeVersionService;
 
     public ConcurrentHashMap<String, AdministratorVersion> getAdministratorVersionMap() throws Exception {
         ConcurrentHashMap<String, AdministratorVersion> map = new ConcurrentHashMap<>();
@@ -178,5 +182,43 @@ public class AdministratorVersionService {
             MyFileUtils.moveFileOrDir(new File(originBasePath), bakBasePath);
         }
         return apiResponse;
+    }
+
+    public void downloadVersion(HttpServletResponse resp, String versionId) throws Exception {
+        mergeVersionService.mergeVersion(versionId);
+        String fileName = versionId + "_RELEASE.zip";
+        String basePath = configuration.getAdministratorVersionBasePath() + versionId + "/versionContent/";
+        String versionZipFilePath = basePath + fileName;
+        String srcVersionDirPath = basePath + versionId + "/";
+        File file = new File(versionZipFilePath);
+        if (file.exists()) {
+            file.delete();
+        }
+        MyFileUtils.compressZip(srcVersionDirPath, versionZipFilePath, versionId + "_上线补丁");
+        resp.setHeader("content-type", "application/octet-stream");
+        resp.setContentType("application/octet-stream");
+        resp.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        byte[] buff = new byte[1024];
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+        try {
+            os = resp.getOutputStream();
+            bis = new BufferedInputStream(new FileInputStream(file));
+            int i = bis.read(buff);
+            while (i != -1) {
+                os.write(buff, 0, buff.length);
+                os.flush();
+                i = bis.read(buff);
+            }
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (bis != null) {
+                bis.close();
+            }
+            if (os != null) {
+                os.close();
+            }
+        }
     }
 }
